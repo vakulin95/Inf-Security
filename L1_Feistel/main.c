@@ -2,12 +2,13 @@
 #include <time.h>
 #include <stdlib.h>
 
-#define DEF_ROUNDS          10
-#define DEF_MES_LEN         64
+#define DEF_ROUNDS              10
+#define DEF_MES_LEN             64
+#define DEF_NUM_OF_PARTS        4
 
 #define GET_BIT(X, NUM)         (( (X) & ( (int64)(1) << (NUM) )) >> (NUM) )
 #define GET_PART(X, NUM)        ((int16)( (X) >> (NUM) * 16))
-#define SET_PART(X, PART, NUM)  (((int64)(PART) << 16 * (NUM)) | (int64)(X) )
+#define SET_PART(X, PART, NUM)  ((int64)(PART) << 16 * (NUM)) | (int64)(X)
 #define MOOVE_R_B(X, Y)         (( (X) >> (Y) ) | ( (X) << ( (Y) & (int32)(15) )))
 #define MOOVE_L_B(X, Y)         (( (X) << (Y) ) | ( (X) >> ( (Y) & (int32)(15) )))
 
@@ -19,10 +20,10 @@ int16 KEYS[DEF_ROUNDS];
 char BIN[DEF_MES_LEN];
 
 int GetKeys(void);
-int64 Merge(int16 b0, int16 b1, int16 b2, int16 b3);
-int32 EncryptFunction(int16 num0, int16 num1, int16 num2, int16 key);
-int64 Encode(int64 num, int keysCount);
-int64 Decode(int64 num, int keysCount);
+int64 Merge(int16 *part);
+int16 EncryptFunction(int16 *part, int16 key);
+int64 Encode(int64 message, int keysCount);
+int64 Decode(int64 message, int keysCount);
 void bits_to_str(int64 N);
 void print_b(char str[255], int N);
 
@@ -60,87 +61,95 @@ int GetKeys(void)
 	return 0;
 }
 
-int64 Merge(int16 b0, int16 b1, int16 b2, int16 b3)
+int64 Merge(int16 *part)
 {
     int i;
     int64 Y = 0;
 
-    // for(i = 0; i < 4; i++)
-    // {
-    //     SET_PART(Y, )
-    // }
+    for(i = 0; i < DEF_NUM_OF_PARTS; i++)
+    {
+        Y = SET_PART(Y, part[i], i);
+    }
 
-	return (int64)b0 << 16 * 0 | (int64)b1 << 16 * 1 | (int64)b2 << 16 * 2 | (int64)b3 << 16 * 3;
+    return Y;
 }
 
-int32 EncryptFunction(int16 num0, int16 num1, int16 num2, int16 key)
+int16 EncryptFunction(int16 *part, int16 key)
 {
-	return MOOVE_L_B(num0, 9) ^ MOOVE_L_B(num1, 9) ^ MOOVE_L_B(num2, 9) ^ (~(MOOVE_R_B(key, 11) ^ num0 ^ num1 ^ num2));
+    int16 Y;
+
+    Y = MOOVE_L_B(part[0], 9) ^ MOOVE_L_B(part[1], 9) ^ MOOVE_L_B(part[2], 9) ^ \
+    (~(MOOVE_R_B(key, 11) ^ part[0] ^ part[1] ^ part[2]));
+
+    return Y;
 }
 
-int64 Encode(int64 num, int keysCount)
+int64 Encode(int64 message, int keysCount)
 {
     int i;
+    int16 P[DEF_NUM_OF_PARTS];
     int16 tmp;
 
 	GetKeys();
 
-	int16 b0 = GET_PART(num, 0);
-	int16 b1 = GET_PART(num, 1);
-	int16 b2 = GET_PART(num, 2);
-	int16 b3 = GET_PART(num, 3);
+    for(i = 0; i < DEF_NUM_OF_PARTS; i++)
+    {
+        P[i] = GET_PART(message, i);
+    }
 
 	for (i = 0; i < DEF_ROUNDS; i++)
 	{
-		tmp = EncryptFunction(b0, b1, b2, KEYS[i]) ^ b3;
-		if (i != DEF_ROUNDS - 1)
+		tmp = EncryptFunction(P, KEYS[i]) ^ P[3];
+
+        if (i != DEF_ROUNDS - 1)
         {
-			b3 = b0;
-			b0 = b1;
-			b1 = b2;
-			b2 = tmp;
+            P[3] = P[0];
+            P[0] = P[1];
+            P[1] = P[2];
+            P[2] = tmp;
 		}
 		else
         {
-			b3 = tmp;
+            P[3] = tmp;
 		}
 
 	}
 
-	return Merge(b0, b1, b2, b3);
+	return Merge(P);
 }
 
-int64 Decode(int64 num, int keysCount)
+int64 Decode(int64 message, int keysCount)
 {
     int i;
+    int16 P[DEF_NUM_OF_PARTS];
     int16 tmp;
 
 	GetKeys();
 
-	int16 b0 = GET_PART(num, 0);
-	int16 b1 = GET_PART(num, 1);
-	int16 b2 = GET_PART(num, 2);
-	int16 b3 = GET_PART(num, 3);
+    for(i = 0; i < DEF_NUM_OF_PARTS; i++)
+    {
+        P[i] = GET_PART(message, i);
+    }
 
 	for (i = DEF_ROUNDS - 1; i >= 0; i--)
 	{
-		tmp = EncryptFunction(b0, b1, b2, KEYS[i]) ^ b3;
+		tmp = EncryptFunction(P, KEYS[i]) ^ P[3];
 
 		if (i != 0)
         {
-			b3 = b2;
-			b2 = b1;
-			b1 = b0;
-			b0 = tmp;
+            P[3] = P[2];
+            P[2] = P[1];
+            P[1] = P[0];
+            P[0] = tmp;
 		}
 		else
         {
-			b3 = tmp;
+            P[3] = tmp;
 		}
 
 	}
 
-	return Merge(b0, b1, b2, b3);
+	return Merge(P);
 }
 
 void bits_to_str(int64 N)
