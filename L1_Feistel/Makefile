@@ -5,7 +5,7 @@ LFLAGS = -lm -o
 
 all: clean built
 
-built: main.o
+built: feistel.o main.o
 	@gcc $^ $(LFLAGS) main.out
 	@make clean_b
 
