@@ -34,8 +34,6 @@ int64 fl_show(int64 message)
     int16 P[DEF_NUM_OF_PARTS];
     int16 F;
 
-	cr_keys();
-
     for(i = 0; i < DEF_NUM_OF_PARTS; i++)
     {
         P[i] = GET_PART(message, i);
@@ -78,6 +76,7 @@ void conv_int(int64 X, char **str)
     {
         (*str)[DEF_MES_LEN - i - 1] = (char)(X >> (i * 8));
     }
+    (*str)[DEF_MES_LEN - 1] = '\0';
 
     return;
 }
