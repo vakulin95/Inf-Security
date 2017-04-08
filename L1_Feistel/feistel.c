@@ -3,8 +3,7 @@
 int64 fl_hide(int64 message)
 {
     int i;
-    int16 P[DEF_NUM_OF_PARTS];
-    int16 tmp;
+    int16 P[DEF_NUM_OF_PARTS], F;
 
 	cr_keys();
 
@@ -13,23 +12,18 @@ int64 fl_hide(int64 message)
         P[i] = GET_PART(message, i);
     }
 
-	for (i = 0; i < DEF_ROUNDS; i++)
+	for (i = 0; i < DEF_ROUNDS - 1; i++)
 	{
-		tmp = gen_func(P, KEYS[i]) ^ P[3];
+		F = gen_func(P, KEYS[i]) ^ P[1];
 
-        if (i != DEF_ROUNDS - 1)
-        {
-            P[3] = P[0];
-            P[0] = P[1];
-            P[1] = P[2];
-            P[2] = tmp;
-		}
-		else
-        {
-            P[3] = tmp;
-		}
-
+        P[1] = P[2];
+        P[2] = P[3];
+        P[3] = P[0];
+        P[0] = F;
 	}
+
+    F = gen_func(P, KEYS[DEF_ROUNDS - 1]) ^ P[1];
+    P[1] = F;
 
 	return join_parts(P);
 }
@@ -38,7 +32,7 @@ int64 fl_show(int64 message)
 {
     int i;
     int16 P[DEF_NUM_OF_PARTS];
-    int16 tmp;
+    int16 F;
 
 	cr_keys();
 
@@ -47,23 +41,18 @@ int64 fl_show(int64 message)
         P[i] = GET_PART(message, i);
     }
 
-	for (i = DEF_ROUNDS - 1; i >= 0; i--)
+	for (i = DEF_ROUNDS - 1; i > 0; i--)
 	{
-		tmp = gen_func(P, KEYS[i]) ^ P[3];
+		F = gen_func(P, KEYS[i]) ^ P[1];
 
-		if (i != 0)
-        {
-            P[3] = P[2];
-            P[2] = P[1];
-            P[1] = P[0];
-            P[0] = tmp;
-		}
-		else
-        {
-            P[3] = tmp;
-		}
-
+        P[1] = P[0];
+        P[0] = P[3];
+        P[3] = P[2];
+        P[2] = F;
 	}
+
+    F = gen_func(P, KEYS[0]) ^ P[1];
+    P[1] = F;
 
 	return join_parts(P);
 }
@@ -124,8 +113,7 @@ int16 gen_func(int16 *part, int16 key)
 {
     int16 Y;
 
-    Y = MOOVE_L_B(part[0], 9) ^ MOOVE_L_B(part[1], 9) ^ MOOVE_L_B(part[2], 9) ^ \
-    (~(MOOVE_R_B(key, 11) ^ part[0] ^ part[1] ^ part[2]));
+    Y = MOOVE_L_B(part[0], 9) ^ (~(MOOVE_R_B(key, 11) ^ part[0]));
 
     return Y;
 }

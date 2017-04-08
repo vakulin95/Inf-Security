@@ -12,6 +12,10 @@ built: feistel.o main.o
 run:
 	@time ./main.out
 
+run_b:
+	@time ./main.out -b
+
+
 #---------------------------------------------#
 %.o: %.c
 	@gcc $(CFLAGS) $< -o $@
