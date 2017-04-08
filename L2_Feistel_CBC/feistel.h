@@ -3,9 +3,9 @@
 #include <stdlib.h>
 
 #define DEF_ROUNDS              10
-#define DEF_MES_LEN             8
+#define DEF_CBC_PART_LEN        8
 #define DEF_NUM_OF_PARTS        4
-#define DEF_NUM_OF_CBC_PARTS    3
+#define DEF_NUM_OF_CBC_PARTS    4
 
 #define GET_BIT(X, NUM)         (( (X) & ( (int64)(1) << (NUM) )) >> (NUM) )
 #define GET_PART(X, NUM)        ((int16)((X) >> (NUM) * 16))
@@ -28,8 +28,8 @@ int64 fl_hide(int64 message);
 int64 fl_show(int64 message);
 void CBCencode(int64 *data, int64 **out);
 void CBCdecode(int64 *data, int64 **out);
-int64 conv_str(char str[DEF_MES_LEN]);
-void conv_int(int64 X, char **str);
+void conv_str(char str[DEF_CBC_PART_LEN], int64 **out);
+void conv_int(int64 *X, char **str);
 void cr_init_vect(void);
 void cr_keys(void);
 int64 join_parts(int16 *part);

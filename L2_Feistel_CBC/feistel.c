@@ -102,27 +102,34 @@ void CBCdecode(int64 *data, int64 **out)
 }
 
 
-int64 conv_str(char str[DEF_MES_LEN])
+void conv_str(char str[DEF_CBC_PART_LEN], int64 **out)
 {
-    int i;
+    int i, p;
     int64 Y = 0;
 
-    for(i = 0; i < DEF_MES_LEN; i++)
+    for(p = 0, i = 0; p < DEF_NUM_OF_CBC_PARTS; p++)
     {
-        Y = (Y << 8) | (int64)(str[i]);
+        for(; i < DEF_CBC_PART_LEN * (p + 1); i++)
+        {
+            (*out)[p] = ((*out)[p] << DEF_CBC_PART_LEN) | (int64)(str[i]);
+        }
     }
 
-    return Y;
+    return;
 }
 
-void conv_int(int64 X, char **str)
+void conv_int(int64 *X, char **str)
 {
-    int i;
+    int i, p, ind;
 
-    for(i = 0; i < DEF_MES_LEN; i++)
+    for(p = DEF_NUM_OF_CBC_PARTS - 1, ind = DEF_CBC_PART_LEN * DEF_NUM_OF_CBC_PARTS - 1; p >= 0; p--)
     {
-        (*str)[DEF_MES_LEN - i - 1] = (char)(X >> (i * 8));
+        for(i = 0; i < DEF_CBC_PART_LEN; i++, ind--)
+        {
+            (*str)[ind] = (char)(X[p] >> (i * DEF_CBC_PART_LEN));
+        }
     }
+    (*str)[DEF_CBC_PART_LEN * DEF_NUM_OF_CBC_PARTS - 1] = '\0';
 
     return;
 }
