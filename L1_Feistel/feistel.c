@@ -68,17 +68,29 @@ int64 fl_show(int64 message)
 	return join_parts(P);
 }
 
-int conv_str(char str[DEF_MES_LEN])
+int64 conv_str(char str[DEF_MES_LEN])
 {
     int i;
-    int Y = 0;
+    int64 Y = 0;
 
     for(i = 0; i < DEF_MES_LEN; i++)
     {
-        //Y = 
+        Y = (Y << 8) | (int64)(str[i]);
     }
 
     return Y;
+}
+
+void conv_int(int64 X, char **str)
+{
+    int i;
+
+    for(i = 0; i < DEF_MES_LEN; i++)
+    {
+        (*str)[DEF_MES_LEN - i - 1] = (char)(X >> (i * 8));
+    }
+
+    return;
 }
 
 void cr_keys(void)
