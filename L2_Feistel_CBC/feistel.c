@@ -34,8 +34,6 @@ int64 fl_show(int64 message)
     int16 P[DEF_NUM_OF_PARTS];
     int16 F;
 
-	cr_keys();
-
     for(i = 0; i < DEF_NUM_OF_PARTS; i++)
     {
         P[i] = GET_PART(message, i);
@@ -56,6 +54,53 @@ int64 fl_show(int64 message)
 
 	return join_parts(P);
 }
+
+void CBCencode(int64 *data, int64 **out)
+{
+    int i;
+    int64 init;
+
+    cr_init_vect();
+
+    for (i = 0; i < DEF_NUM_OF_CBC_PARTS; i++)
+	{
+		if (i == 0)
+		{
+			init = INIT_VECT;
+		}
+		else
+		{
+			init = (*out)[i - 1];
+		}
+
+		(*out)[i] = fl_hide(data[i] ^ init);
+	}
+
+	return;
+}
+
+void CBCdecode(int64 *data, int64 **out)
+{
+    int i;
+    int64 init;
+
+	for (i = DEF_NUM_OF_CBC_PARTS - 1; i >= 0; i--)
+    {
+		if (i == 0)
+		{
+			init = INIT_VECT;
+		}
+		else
+		{
+			init = data[i - 1];
+		}
+
+		(*out)[i] = fl_show(data[i]) ^ init;
+	}
+
+	return;
+}
+
 
 int64 conv_str(char str[DEF_MES_LEN])
 {
@@ -78,6 +123,15 @@ void conv_int(int64 X, char **str)
     {
         (*str)[DEF_MES_LEN - i - 1] = (char)(X >> (i * 8));
     }
+
+    return;
+}
+
+void cr_init_vect(void)
+{
+    srand(time(0));
+
+    INIT_VECT = (int64)rand();
 
     return;
 }
@@ -118,14 +172,18 @@ int16 gen_func(int16 *part, int16 key)
     return Y;
 }
 
-void printb(char str[255], int64 N)
+void printb(char str[255], int64 *N)
 {
-    int i;
+    int p, i;
     printf("%s", str);
 
-    for(i = sizeof(N) * 8 - 1; i >= 0; i--)
+    for(p = 0; p < DEF_NUM_OF_CBC_PARTS; p++)
     {
-        printf("%c", GET_BIT(N, i) + '0');
+        for(i = sizeof(N) * 8 - 1; i >= 0; i--)
+        {
+            printf("%c", GET_BIT(N[p], i) + '0');
+        }
+        printf("\n");
     }
     printf("\n");
 
