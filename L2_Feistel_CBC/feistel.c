@@ -55,48 +55,30 @@ int64 fl_show(int64 message)
 	return join_parts(P);
 }
 
-void CBCencode(int64 *data, int64 **out)
+void flCBC_hide(int64 *in, int64 **out)
 {
     int i;
-    int64 init;
 
     cr_init_vect();
 
-    for (i = 0; i < DEF_NUM_OF_CBC_PARTS; i++)
+    (*out)[0] = fl_hide(in[0] ^ INIT_VECT);
+    for (i = 1; i < DEF_NUM_OF_CBC_PARTS; i++)
 	{
-		if (i == 0)
-		{
-			init = INIT_VECT;
-		}
-		else
-		{
-			init = (*out)[i - 1];
-		}
-
-		(*out)[i] = fl_hide(data[i] ^ init);
+		(*out)[i] = fl_hide(in[i] ^ (*out)[i - 1]);
 	}
 
 	return;
 }
 
-void CBCdecode(int64 *data, int64 **out)
+void flCBC_show(int64 *in, int64 **out)
 {
     int i;
-    int64 init;
 
-	for (i = DEF_NUM_OF_CBC_PARTS - 1; i >= 0; i--)
+	for (i = DEF_NUM_OF_CBC_PARTS - 1; i > 0; i--)
     {
-		if (i == 0)
-		{
-			init = INIT_VECT;
-		}
-		else
-		{
-			init = data[i - 1];
-		}
-
-		(*out)[i] = fl_show(data[i]) ^ init;
+		(*out)[i] = fl_show(in[i]) ^ in[i - 1];
 	}
+    (*out)[0] = fl_show(in[0]) ^ INIT_VECT;
 
 	return;
 }

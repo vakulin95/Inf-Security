@@ -26,8 +26,8 @@ int16 INIT_VECT;
 
 int64 fl_hide(int64 message);
 int64 fl_show(int64 message);
-void CBCencode(int64 *data, int64 **out);
-void CBCdecode(int64 *data, int64 **out);
+void flCBC_hide(int64 *data, int64 **out);
+void flCBC_show(int64 *data, int64 **out);
 void conv_str(char str[DEF_CBC_PART_LEN], int64 **out);
 void conv_int(int64 *X, char **str);
 void cr_init_vect(void);

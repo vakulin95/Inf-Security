@@ -2,7 +2,7 @@
 #include <string.h>
 #include "feistel.h"
 
-#define DEF_STR     "FeistelCBC enc 12346789!!!!!!!!"
+#define DEF_STR     "FeistelCBC enc: 012346789qwerty"
 
 int main(int argc, char *argv[])
 {
@@ -17,8 +17,8 @@ int main(int argc, char *argv[])
     dec = (int64*)malloc(sizeof(int64) * DEF_NUM_OF_CBC_PARTS);
 
     conv_str(DEF_STR, &mes);
-    CBCencode(mes, &enc);
-    CBCdecode(enc, &dec);
+    flCBC_hide(mes, &enc);
+    flCBC_show(enc, &dec);
 
     conv_int(mes, &buf);
     printf("Input message:\n%s\n\n", buf);
