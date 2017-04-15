@@ -2,9 +2,10 @@
 
 void rand_gen(void)
 {
-    int i, temp_i;
+    int i, temp_i, rep_num;
 
     R[0] = DEF_R0;
+    rep_num = 0;
     for(i = 0; i < DEF_ARR_LEN - 1; i++)
     {
         temp_i = i + 1;
@@ -14,12 +15,23 @@ void rand_gen(void)
 
         if(check_mas(R[temp_i], temp_i))
         {
+            //rep_num++;
             IND = temp_i;
             goto ret;
         }
+
+        // if(i > 1 && R[temp_i] == R[1])
+        // {
+        //     IND = temp_i;
+        //     goto ret;
+        // }
     }
 
+    IND = DEF_ARR_LEN;
+    RIND = -1;
+
 ret:
+    //printf("rep_num:\t%d\n", rep_num);
     return;
 }
 
@@ -42,24 +54,41 @@ ret:
 
 void print_res(int list_val)
 {
-    int i, j, k, ind;
+    int i, j, ind, str_num;
 
-    printf("A\t\t%d\nB\t\t%d\nR[0]\t\t%f\nNum of val\t%d\nRep R[%d]\t%f%d\n\n", \
-    DEF_A, DEF_B, R[0], IND - 1, RIND, R[RIND]);
+    printf("A\t\t%d\nB\t\t%d\nR[0]\t\t%f\nNum of val\t%d\n", \
+    DEF_A, DEF_B, R[0], IND - 1);
+
+    if(RIND != -1)
+    {
+        printf("Rep R[%d]\t%f%d\n", RIND, R[RIND]);
+    }
+    printf("\n");
 
     if(list_val)
     {
         printf("List of generted values:\n");
 
-        for(i = 0; i < (int)(DEF_ARR_LEN / DEF_NOP); i++)
+        str_num = (int)ceil((float)IND / (float)DEF_NOP);
+        for(i = 1; i < str_num; i++)
         {
-            for(j = 0, ind = i; j < DEF_NOP; j++, ind += DEF_NOP)
+            for(j = 0, ind = i; j < DEF_NOP; j++, ind += str_num)
             {
-                if(ind == IND)
+                if(ind <= IND)
+                {
+                    if(ind != RIND && ind != IND)
+                    {
+                        printf("R[%3d]: %.6f;   ", ind, R[ind]);
+                    }
+                    else
+                    {
+                        printf("*R[%3d]: %.6f;   ", ind, R[ind]);
+                    }
+                }
+                else
                 {
                     goto ret;
                 }
-                printf("R[%3d]: %f;   ", ind, R[ind]);
             }
             printf("\n");
         }
