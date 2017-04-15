@@ -63,11 +63,10 @@ void print_res(int list_val)
     {
         printf("Rep R[%d]\t%f%d\n", RIND, R[RIND]);
     }
-    printf("\n");
 
     if(list_val)
     {
-        printf("List of generted values:\n");
+        printf("\nList of generted values:\n");
 
         str_num = (int)ceil((float)IND / (float)DEF_NOP);
         for(i = 1; i < str_num; i++)

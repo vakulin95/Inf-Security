@@ -12,6 +12,9 @@ built: rand_gen.o main.o
 run:
 	@time ./main.out
 
+run_l:
+	@time ./main.out -l
+
 #---------------------------------------------#
 %.o: %.c
 	@gcc $(CFLAGS) $< -o $@
