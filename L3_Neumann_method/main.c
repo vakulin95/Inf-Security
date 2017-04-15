@@ -4,8 +4,6 @@
 
 int main(int argc, char *argv[])
 {
-    int i;
-
     printf("\n-----------------------------------------Feistel network-----------------------------------------\n\n");
 
     rand_gen();

@@ -1,3 +1,6 @@
+#ifndef __FEISTEL_H__
+#define __FEISTEL_H__
+
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
@@ -30,3 +33,5 @@ void cr_keys(void);
 int64 join_parts(int16 *part);
 int16 gen_func(int16 *part, int16 key);
 void printb(char str[255], int64 N);
+
+#endif
