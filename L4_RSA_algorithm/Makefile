@@ -1,12 +1,13 @@
 # Makefile
 
-CFLAGS = -c -w -O3
-LFLAGS = -lm -o
+CFLAGS = -c -w -O3 -I/usr/local/include
+GSLFLAGS = -L/usr/local/lib
+LFLAGS = -lm -lgmp
 
 all: clean built
 
 built: rsa.o main.o
-	@gcc $^ $(LFLAGS) main.out
+	@gcc $^ -o main.out -lm -lgmp
 	@make clean_b
 
 run:
@@ -14,7 +15,7 @@ run:
 
 #---------------------------------------------#
 %.o: %.c
-	@gcc $(CFLAGS) $< -o $@
+	@gcc $(GSLFLAGS) $(CFLAGS) $(LFLAGS) $< -o $@
 
 #---------------------------------------------#
 
