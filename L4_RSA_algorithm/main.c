@@ -15,8 +15,13 @@ int main(int argc, char *argv[])
 
     d = Find_d(Eiler(DEF_N), DEF_E);
 
+    printf("Inputed message:\t%s\n", DEF_SHIFR);
+
     Dec(DEF_N, d);
     printf("Decoded message:\t%s\n", rsa_dtext);
+
+    Enc(DEF_N, DEF_E);
+    printf("Encoded message:\t%s\n", rsa_etext);
 
     printf("---------------------------------------------------------------------------------------------------\n");
 
