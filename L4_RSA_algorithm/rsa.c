@@ -4,25 +4,23 @@ int64 Eiler(int64 n)
 {
     int64 i;
     int64 fi = n;
-    int64 tn = n;
     int64 en = (int64)(sqrt((double)(n) + 1));
 
     for (i = 2; i <= en; i++)
     {
-        if (!(tn % i))
+        if (!(n % i))
         {
-            while (!(tn % i))
+            while (!(n % i))
             {
-                tn = (double)tn / (double)i;
+                n = n / i;
             }
-
-            fi = fi - (int64)((double)fi / (double)i);
+            fi = fi - (fi / i);
         }
     }
 
-    if (tn > 1)
+    if (n > 1)
     {
-        fi = fi - (int64)((double)fi / (double)tn);
+        fi = fi - (fi / n);
     }
 
     return fi;
@@ -61,12 +59,12 @@ void Enc(int64 n, int64 e)
 
     strcpy(copy, rsa_dtext);
     copy_len = strlen(copy);
-    while (copy_len > 0)
+    while(copy_len)
     {
         mpz_init(gmp_iblok);
         mpz_init(gmp_modpow);
 
-        if (DEF_BLOCK_LEN < copy_len)
+        if(DEF_BLOCK_LEN < copy_len)
         {
             memcpy(buf, copy, DEF_BLOCK_LEN);
             buf[DEF_BLOCK_LEN] = '\0';
@@ -88,7 +86,7 @@ void Enc(int64 n, int64 e)
         sprintf(rsa_block, "%llu", modpow);
         while(strlen(rsa_block) < DEF_BLOCK_LEN)
         {
-            sprintf(catbuf, "0\0");
+            sprintf(catbuf, "0");
             strcat(catbuf, rsa_block);
             strcpy(rsa_block, catbuf);
         }
@@ -117,12 +115,12 @@ void Dec(int64 n, int64 d)
 
     strcpy(copy, rsa_shifro_text);
     copy_len = strlen(copy);
-    while (copy_len)
+    while(copy_len)
     {
         mpz_init(gmp_iblok);
         mpz_init(gmp_modpow);
 
-        if (DEF_BLOCK_LEN < copy_len)
+        if(DEF_BLOCK_LEN < copy_len)
         {
             memcpy(buf, copy, DEF_BLOCK_LEN);
             buf[DEF_BLOCK_LEN] = '\0';
@@ -143,7 +141,7 @@ void Dec(int64 n, int64 d)
         sprintf(rsa_block, "%llu", modpow);
         while(strlen(rsa_block) < DEF_BLOCK_LEN)
         {
-            sprintf(catbuf, "0\0");
+            sprintf(catbuf, "0");
             strcat(catbuf, rsa_block);
             strcpy(rsa_block, catbuf);
         }
