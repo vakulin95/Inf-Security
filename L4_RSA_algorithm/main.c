@@ -11,6 +11,8 @@ int main(int argc, char *argv[])
 
     int64 d;
 
+    rsa_init(DEF_SHIFR, DEF_N, DEF_E);
+
     sprintf(rsa_shifro_text, "%s", DEF_SHIFR);
 
     d = Find_d(Eiler(DEF_N), DEF_E);

@@ -83,7 +83,7 @@ void Enc(int64 n, int64 e)
         mpz_export(&modpow, 0, -1, sizeof(modpow), 0, 0, gmp_modpow);
 
         sprintf(rsa_block, "%llu", modpow);
-        ins_null();
+        rsa_ins_null();
         strcat(rsa_etext, rsa_block);
 
         mpz_clear(gmp_iblok);
@@ -132,7 +132,7 @@ void Dec(int64 n, int64 d)
         mpz_export(&modpow, 0, -1, sizeof(modpow), 0, 0, gmp_modpow);
 
         sprintf(rsa_block, "%llu", modpow);
-        ins_null();
+        rsa_ins_null();
         strcat(rsa_dtext, rsa_block);
 
         mpz_clear(gmp_iblok);
@@ -142,7 +142,7 @@ void Dec(int64 n, int64 d)
     return;
 }
 
-void ins_null(void)
+void rsa_ins_null(void)
 {
     char buf[DEF_STR_LEN];
 
@@ -152,6 +152,17 @@ void ins_null(void)
         strcat(buf, rsa_block);
         strcpy(rsa_block, buf);
     }
+
+    return;
+}
+
+void rsa_init(char *str, int64 n, int64 e)
+{
+    sprintf(rsa_shifro_text, "%s", str);
+
+    rsa_Block_len = strlen(str) / DEF_NOF_BLOCK;
+    rsa_Eil = Eiler(n);
+    rsa_D = Find_d(rsa_Eil, e);
 
     return;
 }
