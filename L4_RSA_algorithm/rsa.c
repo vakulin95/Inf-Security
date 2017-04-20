@@ -48,7 +48,6 @@ void Enc(int64 n, int64 e)
     mpz_t gmp_modpow, gmp_iblok, gmp_e, gmp_n;
     int64 modpow;
     char buf[DEF_STR_LEN];
-    char catbuf[DEF_STR_LEN];
     char copy[DEF_STR_LEN];
     int copy_len;
 
@@ -84,12 +83,7 @@ void Enc(int64 n, int64 e)
         mpz_export(&modpow, 0, -1, sizeof(modpow), 0, 0, gmp_modpow);
 
         sprintf(rsa_block, "%llu", modpow);
-        while(strlen(rsa_block) < DEF_BLOCK_LEN)
-        {
-            sprintf(catbuf, "0");
-            strcat(catbuf, rsa_block);
-            strcpy(rsa_block, catbuf);
-        }
+        ins_null();
         strcat(rsa_etext, rsa_block);
 
         mpz_clear(gmp_iblok);
@@ -103,9 +97,8 @@ void Dec(int64 n, int64 d)
 {
     mpz_t gmp_modpow, gmp_iblok, gmp_d, gmp_n;
     int64 modpow;
-    char buf[DEF_SIFR_LEN];
-    char catbuf[DEF_STR_LEN];
-    char copy[DEF_SIFR_LEN];
+    char buf[DEF_STR_LEN];
+    char copy[DEF_STR_LEN];
     int copy_len;
 
     mpz_init(gmp_d);
@@ -139,16 +132,25 @@ void Dec(int64 n, int64 d)
         mpz_export(&modpow, 0, -1, sizeof(modpow), 0, 0, gmp_modpow);
 
         sprintf(rsa_block, "%llu", modpow);
-        while(strlen(rsa_block) < DEF_BLOCK_LEN)
-        {
-            sprintf(catbuf, "0");
-            strcat(catbuf, rsa_block);
-            strcpy(rsa_block, catbuf);
-        }
+        ins_null();
         strcat(rsa_dtext, rsa_block);
 
         mpz_clear(gmp_iblok);
         mpz_clear(gmp_modpow);
+    }
+
+    return;
+}
+
+void ins_null(void)
+{
+    char buf[DEF_STR_LEN];
+
+    while(strlen(rsa_block) < DEF_BLOCK_LEN)
+    {
+        sprintf(buf, "0");
+        strcat(buf, rsa_block);
+        strcpy(rsa_block, buf);
     }
 
     return;

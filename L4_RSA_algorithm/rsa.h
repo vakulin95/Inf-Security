@@ -28,5 +28,6 @@ int64 Eiler(int64 n);
 int64 Find_d(int64 fi, int64 e);
 void Enc(int64 n, int64 e);
 void Dec(int64 n, int64 d);
+void ins_null(void);
 
 #endif
