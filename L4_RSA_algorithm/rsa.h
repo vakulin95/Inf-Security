@@ -10,7 +10,7 @@
 #include <gmp.h>
 
 #define DEF_STR_LEN         256
-#define DEF_NOF_BLOCK       3
+#define DEF_BLOCK_LEN       15
 
 typedef unsigned long long int  int64;
 

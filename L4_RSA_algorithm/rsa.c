@@ -2,6 +2,7 @@
 
 //---------------------------------------------------------------------------//
 
+void rsa_get_iblock(char *str, mpz_t gmp_iblock);
 void rsa_ins_null(void);
 int64 rsa_eiler(int64 n);
 int64 rsa_set_d(int64 fi, int64 e);
@@ -10,9 +11,21 @@ int64 rsa_set_d(int64 fi, int64 e);
 
 void rsa_init(char *str, int64 n, int64 e)
 {
+    int i;
+    int rem;
+
     sprintf(rsa_INIT, "%s", str);
 
-    rsa_Block_len = strlen(str) / DEF_NOF_BLOCK;
+    rem = strlen(rsa_INIT) % DEF_BLOCK_LEN;
+
+    if(rem)
+    {
+        for(i = 0; i < DEF_BLOCK_LEN - rem; i++)
+        {
+            strcat(rsa_INIT, "0");
+        }
+    }
+
     rsa_Eil = rsa_eiler(n);
     rsa_D = rsa_set_d(rsa_Eil, e);
 
@@ -39,14 +52,14 @@ void rsa_encode(int64 n, int64 e)
         mpz_init(gmp_iblock);
         mpz_init(gmp_modpow);
 
-        if(rsa_Block_len < copy_len)
+        if(DEF_BLOCK_LEN < copy_len)
         {
-            memcpy(buf, copy, rsa_Block_len);
-            buf[rsa_Block_len] = '\0';
+            memcpy(buf, copy, DEF_BLOCK_LEN);
+            buf[DEF_BLOCK_LEN] = '\0';
             mpz_set_str(gmp_iblock, buf, 10);
 
             strcpy(buf, copy);
-            memcpy(copy, buf + rsa_Block_len, copy_len - rsa_Block_len + 1);
+            memcpy(copy, buf + DEF_BLOCK_LEN, copy_len - DEF_BLOCK_LEN + 1);
             copy_len = strlen(copy);
         }
         else
@@ -89,13 +102,13 @@ void rsa_decode(int64 n, int64 d)
         mpz_init(gmp_iblock);
         mpz_init(gmp_modpow);
 
-        if(rsa_Block_len < copy_len)
+        if(DEF_BLOCK_LEN < copy_len)
         {
-            memcpy(buf, copy, rsa_Block_len);
-            buf[rsa_Block_len] = '\0';
+            memcpy(buf, copy, DEF_BLOCK_LEN);
+            buf[DEF_BLOCK_LEN] = '\0';
             mpz_set_str(gmp_iblock, buf, 10);
             strcpy(buf, copy);
-            memcpy(copy, buf + rsa_Block_len, copy_len - rsa_Block_len + 1);
+            memcpy(copy, buf + DEF_BLOCK_LEN, copy_len - DEF_BLOCK_LEN + 1);
             copy_len = strlen(copy);
         }
         else
@@ -120,11 +133,18 @@ void rsa_decode(int64 n, int64 d)
 
 //---------------------------------------------------------------------------//
 
+void rsa_get_iblock(char *str, mpz_t gmp_iblock)
+{
+    
+
+    return;
+}
+
 void rsa_ins_null(void)
 {
     char buf[DEF_STR_LEN];
 
-    while(strlen(rsa_BLOCK) < rsa_Block_len)
+    while(strlen(rsa_BLOCK) < DEF_BLOCK_LEN)
     {
         sprintf(buf, "0");
         strcat(buf, rsa_BLOCK);

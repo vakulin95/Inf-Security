@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include "rsa.h"
 
-#define DEF_SHIFR               "419529693641281414842251130008422950947927526"
-#define DEF_N                   (int64)(517758144238469)
-#define DEF_E                   (int64)(15931)
+// variant # 20
+#define DEF_SHIFR               "108230462382949240744446393133139920760825242128635453394626156290136879344"
+#define DEF_N                   (int64)(274611845366113)
+#define DEF_E                   (int64)(23311)
 
 int main(int argc, char *argv[])
 {
@@ -11,7 +12,7 @@ int main(int argc, char *argv[])
 
     rsa_init(DEF_SHIFR, DEF_N, DEF_E);
 
-    printf("Inputed message:\t%s\n", DEF_SHIFR);
+    printf("Inputed message:\t%s\n", rsa_INIT);
 
     rsa_decode(DEF_N, rsa_D);
     printf("Decoded message:\t%s\n", rsa_DTEXT);
@@ -20,7 +21,7 @@ int main(int argc, char *argv[])
     printf("Encoded message:\t%s\n", rsa_ETEXT);
 
     printf("\nProgram result:\t\t");
-    if(!strcmp(DEF_SHIFR, rsa_ETEXT))
+    if(!strcmp(rsa_INIT, rsa_ETEXT))
     {
         printf("Success!\n");
     }
