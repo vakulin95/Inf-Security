@@ -1,6 +1,6 @@
 # Makefile
 
-CFLAGS = -c -w -O3 -I/usr/local/include
+CFLAGS = -c -w -I/usr/local/include
 GSLFLAGS = -L/usr/local/lib
 LFLAGS = -lm -lgmp
 

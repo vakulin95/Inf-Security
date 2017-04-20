@@ -21,8 +21,6 @@ char rsa_DTEXT[DEF_STR_LEN];
 char rsa_INIT[DEF_STR_LEN];
 char rsa_BLOCK[DEF_STR_LEN];
 
-int rsa_Block_len;
-
 int64 rsa_Eil;
 int64 rsa_D;
 
