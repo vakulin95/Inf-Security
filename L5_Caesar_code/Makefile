@@ -6,7 +6,7 @@ LFLAGS = -lm -lgmp
 
 all: clean built
 
-built: caes.o main.o
+built: main.o
 	@gcc $^ -o main.out -lm -lgmp
 	@make clean_b
 
