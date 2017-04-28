@@ -10,15 +10,6 @@ int main(int argc, char *argv[])
 
     printf("String Entered:\n\n%ls\n\nlength: %d\n", TEXT, wcslen(TEXT));
 
-    // if(TEXT[0] == L'w')
-    // {
-    //     printf("+\n");
-    // }
-    // else
-    // {
-    //     printf("-\n");
-    // }
-
     printf("-----------------------------------------------------------------------------------------------\n");
 
     return 0;
