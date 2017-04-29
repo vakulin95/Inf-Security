@@ -17,9 +17,8 @@ int main(int argc, char *argv[])
 
     printf("\n-----------------------------------------Caesar's code-----------------------------------------\n\n");
 
-    //printf("%ls\n\n", TEXT);
     hack();
-    printf("%ls\n", TEXT);
+    printf("\n%ls\n", TEXT);
 
     printf("-----------------------------------------------------------------------------------------------\n");
 
@@ -138,10 +137,16 @@ void hack(void)
             ind = find_in_alph(TEXT[i], 1);
         }
 
-
         if(ind != -1)
         {
-            TEXT[i] = alphabet[ind].ec_symb;
+            if(TEXT[i] >= _L('А') && TEXT[i] <= _L('Я'))
+            {
+                TEXT[i] = _UPPERCASE(alphabet[ind].ec_symb);
+            }
+            else
+            {
+                TEXT[i] = alphabet[ind].ec_symb;
+            }
         }
     }
 
