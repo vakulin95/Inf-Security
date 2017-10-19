@@ -6,27 +6,42 @@
 #define DEF_PATH            "files/"
 #define DEF_PATH_STR_LEN    125
 
-#define DEF_IM_WIDTH        400
-#define DEF_IM_HEIGHT       400
+#define DEF_IM_WIDTH        512
+#define DEF_IM_HEIGHT       DEF_IM_WIDTH // 512
 #define DEF_IM_QUALITY      75
 #define DEF_IM_DIM          3
 
-unsigned char T[DEF_IM_WIDTH][DEF_IM_HEIGHT][DEF_IM_DIM];
+#define DEF_BL_SIZE         8
+#define DEF_NOF_BL          DEF_IM_WIDTH / DEF_BL_SIZE
 
-int load_im_mass(char *filename);
+#define R(X)              (X[0])
+#define G(X)            (X[1])
+#define B(X)             (X[2])
+
+#define DEF_IM_             128
+
+unsigned char IM[DEF_IM_WIDTH][DEF_IM_HEIGHT][DEF_IM_DIM];
+unsigned char BLOCKS[DEF_NOF_BL * DEF_NOF_BL][DEF_BL_SIZE][DEF_BL_SIZE][DEF_IM_DIM];
+
+int load_jpg(char *filename);
 void write_jpg(char *filename);
+void init_block(unsigned char ***im, unsigned char ***bl);
+void write_blocks(void);
 
 int main(void)
 {
     size_t i, j;
 
-    load_im_mass("in1.jpg");
+    load_jpg("in.jpg");
+
+
+
     write_jpg("out.jpg");
 
     return 0;
 }
 
-int load_im_mass(char  *filename)
+int load_jpg(char  *filename)
 {
     size_t i, j;
     unsigned char *pBuf;
@@ -47,7 +62,7 @@ int load_im_mass(char  *filename)
 
     if(Y.image_width != DEF_IM_WIDTH || Y.image_height != DEF_IM_HEIGHT || Y.num_components != DEF_IM_DIM)
     {
-        printf("load_im_mass(): Image size!\n");
+        printf("load_jpg(): Image size!\n");
         getchar();
         return 1;
     }
@@ -61,9 +76,9 @@ int load_im_mass(char  *filename)
         jpeg_read_scanlines(&Y, (JSAMPARRAY)&(pBuf), 1);
         for (j = 0; j < DEF_IM_WIDTH; j++)
         {
-            T[i][j][0] = pBuf[j*Y.num_components + 0];
-            T[i][j][1] = pBuf[j*Y.num_components + 1];
-            T[i][j][2] = pBuf[j*Y.num_components + 2];
+            IM[i][j][0] = pBuf[j*Y.num_components + 0];
+            IM[i][j][1] = pBuf[j*Y.num_components + 1];
+            IM[i][j][2] = pBuf[j*Y.num_components + 2];
         }
         // i++;
     }
@@ -111,11 +126,24 @@ void write_jpg(char *filename)
     i = 0;
     while (cinfo.next_scanline < cinfo.image_height)
     {
-        row_pointer[0] = (JSAMPLE *)(T[i]);
+        row_pointer[0] = (JSAMPLE *)(IM[i]);
         jpeg_write_scanlines(&cinfo, row_pointer, 1);
         i++;
     }
 
     jpeg_finish_compress(&cinfo);
     jpeg_destroy_compress(&cinfo);
+}
+
+void init_block(unsigned char ***im, unsigned char ***bl)
+{
+    size_t i, j;
+
+    for (i = 0; i < DEF_BL_SIZE; i++)
+    {
+        for(j = 0; j < DEF_BL_SIZE; j++)
+        {
+            bl[i][j] = im[i][j];
+        }
+    }
 }
