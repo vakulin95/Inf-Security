@@ -1,6 +1,6 @@
 # Makefile
 
-CFLAGS = -c
+CFLAGS = -c -O3
 LFLAGS = -lm -ljpeg -o
 
 all: built run clean

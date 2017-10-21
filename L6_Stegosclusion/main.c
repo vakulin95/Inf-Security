@@ -59,32 +59,38 @@ void encrypt(void)
 
     hlen = DEF_PHB2_SIZE * DEF_PHB2_SIZE;
 
-    u = 0;
-    v = 0;
-    init_block(u, v);
-    memset(PHASH, 0, hlen);
-    pHash();
-
-
-    for(i = 0; i < hlen; i++)
+    for(u = 0; u < DEF_IM_HEIGHT; u += DEF_BL_SIZE)
     {
-        printf("%d", PHASH[i]);
-    }
-
-    lsb("q");
-
-    for (i = 0; i < DEF_BL_SIZE; i++)
-    {
-        for(j = 0; j < DEF_BL_SIZE; j++)
+        for(v = 0; v < DEF_IM_WIDTH; v += DEF_BL_SIZE)
         {
-            R(IM[u + i][v + j]) = R(BLOCK[i][j]);
-            G(IM[u + i][v + j]) = G(BLOCK[i][j]);
-            B(IM[u + i][v + j]) = B(BLOCK[i][j]);
+            memset(PHASH, 0, hlen);
+            clean_block();
+
+            init_block(u, v);
+            pHash();
+
+            // for(i = 0; i < hlen; i++)
+            // {
+            //     printf("%d", PHASH[i]);
+            // }
+            // printf("\n");
+
+            lsb("q");
+
+            for (i = 0; i < DEF_BL_SIZE; i++)
+            {
+                for(j = 0; j < DEF_BL_SIZE; j++)
+                {
+                    R(IM[u + i][v + j]) = R(BLOCK[i][j]);
+                    G(IM[u + i][v + j]) = G(BLOCK[i][j]);
+                    B(IM[u + i][v + j]) = B(BLOCK[i][j]);
+                }
+            }
         }
     }
 
-    printf("\nencrypt finished\n");
-    getchar();
+    printf("encrypt finished\n");
+    // getchar();
 }
 
 int load_jpg(char  *filename)
@@ -277,14 +283,14 @@ void pHash(void)
     {
         for(j = 0; j < DEF_PHB2_SIZE; j++)
         {
-            printf("%8.2f ", DCT[i][j]);
+            // printf("%8.2f ", DCT[i][j]);
             avg += DCT[i][j];
         }
-        printf("\n");
+        // printf("\n");
     }
     avg -= DCT[0][0];
     avg /= pow(DEF_PHB2_SIZE, 2);
-    printf("%5.3f\n", avg);
+    // printf("%5.3f\n", avg);
 
     for(i = 0; i < DEF_PHB2_SIZE; i++)
     {
