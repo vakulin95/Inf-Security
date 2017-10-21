@@ -22,10 +22,14 @@
 #define G(X)                (X[1])
 #define B(X)                (X[2])
 
+#define ON_K_BIT(X, K)      X | (1 << (K - 1))
+#define OFF_K_BIT(X, K)     X & (~(1 << (K - 1)))
+
 unsigned char IM[DEF_IM_WIDTH][DEF_IM_HEIGHT][DEF_IM_DIM];
 unsigned char BLOCK[DEF_BL_SIZE][DEF_BL_SIZE][DEF_IM_DIM];
 unsigned char PHASH[DEF_PHB2_SIZE * DEF_PHB2_SIZE];
 
+void encrypt(void);
 int load_jpg(char *filename);
 void write_jpg(char *filename);
 void init_block(size_t x, size_t y);
@@ -33,7 +37,7 @@ void clean_block(void);
 float pool(size_t I, size_t J);
 void pHash(void);
 void dct(float **DCTMatrix, float **Matrix, int N, int M);
-void encrypt(void);
+void lsb(char *key);
 
 int main(void)
 {
@@ -50,12 +54,14 @@ int main(void)
 
 void encrypt(void)
 {
-    size_t i;
+    size_t i, j, u, v;
     int hlen;
 
     hlen = DEF_PHB2_SIZE * DEF_PHB2_SIZE;
 
-    init_block(0, 32);
+    u = 0;
+    v = 0;
+    init_block(u, v);
     memset(PHASH, 0, hlen);
     pHash();
 
@@ -63,6 +69,18 @@ void encrypt(void)
     for(i = 0; i < hlen; i++)
     {
         printf("%d", PHASH[i]);
+    }
+
+    lsb("q");
+
+    for (i = 0; i < DEF_BL_SIZE; i++)
+    {
+        for(j = 0; j < DEF_BL_SIZE; j++)
+        {
+            R(IM[u + i][v + j]) = R(BLOCK[i][j]);
+            G(IM[u + i][v + j]) = G(BLOCK[i][j]);
+            B(IM[u + i][v + j]) = B(BLOCK[i][j]);
+        }
     }
 
     printf("\nencrypt finished\n");
@@ -291,6 +309,7 @@ void dct(float **DCTMatrix, float **Matrix, int N, int M)
 {
 
     int i, j, u, v;
+
     for (u = 0; u < N; ++u)
     {
         for (v = 0; v < M; ++v)
@@ -306,4 +325,18 @@ void dct(float **DCTMatrix, float **Matrix, int N, int M)
             }
         }
     }
+ }
+
+// LSB без ключа
+ void lsb(char *key)
+ {
+     size_t i, j;
+
+     for(i = 0; i < DEF_BL_SIZE; i++)
+     {
+         for(j = 0; j < DEF_BL_SIZE; j++)
+         {
+             (PHASH[i * DEF_BL_SIZE + j]) ? ON_K_BIT(B(BLOCK[i][j]), 1) : OFF_K_BIT(B(BLOCK[i][j]), 1);
+         }
+     }
  }
