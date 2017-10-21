@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <jpeglib.h>
 #include <setjmp.h>
+#include <math.h>
+#include <string.h>
 
 #define DEF_PATH            "files/"
 #define DEF_PATH_STR_LEN    125
@@ -11,22 +13,27 @@
 #define DEF_IM_QUALITY      75
 #define DEF_IM_DIM          3
 
-#define DEF_BL_SIZE         8
+#define DEF_BL_SIZE         64
+#define DEF_PHB1_SIZE       32
+#define DEF_PHB2_SIZE       8
 #define DEF_NOF_BL          DEF_IM_WIDTH / DEF_BL_SIZE
 
-#define R(X)              (X[0])
-#define G(X)            (X[1])
-#define B(X)             (X[2])
-
-#define DEF_IM_             128
+#define R(X)                (X[0])
+#define G(X)                (X[1])
+#define B(X)                (X[2])
 
 unsigned char IM[DEF_IM_WIDTH][DEF_IM_HEIGHT][DEF_IM_DIM];
-unsigned char BLOCKS[DEF_NOF_BL * DEF_NOF_BL][DEF_BL_SIZE][DEF_BL_SIZE][DEF_IM_DIM];
+unsigned char BLOCK[DEF_BL_SIZE][DEF_BL_SIZE][DEF_IM_DIM];
+unsigned char PHASH[DEF_PHB2_SIZE * DEF_PHB2_SIZE];
 
 int load_jpg(char *filename);
 void write_jpg(char *filename);
-void init_block(unsigned char ***im, unsigned char ***bl);
-void write_blocks(void);
+void init_block(size_t x, size_t y);
+void clean_block(void);
+float pool(size_t I, size_t J);
+void pHash(void);
+void dct(float **DCTMatrix, float **Matrix, int N, int M);
+void encrypt(void);
 
 int main(void)
 {
@@ -34,11 +41,34 @@ int main(void)
 
     load_jpg("in.jpg");
 
-
+    encrypt();
 
     write_jpg("out.jpg");
 
     return 0;
+}
+
+void encrypt(void)
+{
+    size_t i;
+    int hlen;
+
+    hlen = DEF_PHB2_SIZE * DEF_PHB2_SIZE;
+
+    init_block(0, 0);
+    memset(PHASH, 0, hlen);
+    printf("Stop\n");
+    getchar();
+    pHash();
+
+
+    for(i = 0; i < hlen; i++)
+    {
+        printf("%d ", PHASH[i]);
+    }
+
+    printf("encrypt finished\n");
+    getchar();
 }
 
 int load_jpg(char  *filename)
@@ -135,7 +165,7 @@ void write_jpg(char *filename)
     jpeg_destroy_compress(&cinfo);
 }
 
-void init_block(unsigned char ***im, unsigned char ***bl)
+void init_block(size_t x, size_t y)
 {
     size_t i, j;
 
@@ -143,7 +173,141 @@ void init_block(unsigned char ***im, unsigned char ***bl)
     {
         for(j = 0; j < DEF_BL_SIZE; j++)
         {
-            bl[i][j] = im[i][j];
+            R(BLOCK[i][j]) = R(IM[x + i][y + j]);
+            G(BLOCK[i][j]) = G(IM[x + i][y + j]);
+            B(BLOCK[i][j]) = B(IM[x + i][y + j]);
         }
     }
 }
+
+void clean_block(void)
+{
+    size_t i, j;
+
+    for(i = 0; i < DEF_BL_SIZE; i++)
+    {
+        for(j = 0; j < DEF_BL_SIZE; j++)
+        {
+            R(BLOCK[i][j]) = 0;
+            G(BLOCK[i][j]) = 0;
+            B(BLOCK[i][j]) = 0;
+        }
+    }
+}
+
+float pool(size_t I, size_t J)
+{
+    size_t i, j;
+    unsigned char tR, tG, tB;
+    unsigned char R[DEF_IM_DIM];
+    int scale;
+    float avg;
+
+    tR = R(BLOCK[I][J]);
+    tG = G(BLOCK[I][J]);
+    tB = B(BLOCK[I][J]);
+    scale = DEF_BL_SIZE / DEF_PHB1_SIZE;
+    for(i = I + 1; i < I + scale; i++)
+    {
+        for(j = J + 1; j < J + scale; j++)
+        {
+            tR += R(BLOCK[i][j]);
+            tG += G(BLOCK[i][j]);
+            tB += B(BLOCK[i][j]);
+        }
+    }
+    R(R) = tR / scale;
+    G(R) = tG / scale;
+    B(R) = tB / scale;
+
+    // Приведение к яркостному представлению
+    avg = (R(R) + G(R) + B(R)) / DEF_IM_DIM;
+
+    return avg;
+}
+
+void pHash(void)
+{
+    size_t i, j;
+    float **PHB_32, **DCT;
+    float P, avg;
+    int scale;
+
+    PHB_32 = (float**)malloc(sizeof(float*) * DEF_PHB1_SIZE);
+    DCT = (float**)malloc(sizeof(float*) * DEF_PHB1_SIZE);
+
+    for(i = 0 ; i < DEF_PHB1_SIZE; i++)
+    {
+        PHB_32[i] = (float*)malloc(sizeof(float) * DEF_PHB1_SIZE);
+        DCT[i] = (float*)malloc(sizeof(float) * DEF_PHB1_SIZE);
+    }
+
+    // Масштабирование
+    scale = DEF_BL_SIZE / DEF_PHB1_SIZE;
+    for(i = 0; i < DEF_PHB1_SIZE; i++)
+    {
+        for(j = 0; j < DEF_PHB1_SIZE; j++)
+        {
+            P = pool(i*scale, j*scale);
+            PHB_32[i][j] = P;
+        }
+    }
+
+    dct(DCT, PHB_32, DEF_PHB1_SIZE, DEF_PHB1_SIZE);
+
+    printf("Stop\n");
+    getchar();
+
+    avg = 0;
+    for(i = 0; i < DEF_PHB2_SIZE; i++)
+    {
+        for(j = 0; j < DEF_PHB2_SIZE; j++)
+        {
+            printf("%8.2f ", DCT[i][j]);
+            // avg += DCT[i][j];
+        }
+        printf("\n");
+    }
+    printf("Stop\n");
+    getchar();
+    avg /= pow(DEF_PHB2_SIZE, 2);
+
+    for(i = 0; i < DEF_PHB2_SIZE; i++)
+    {
+        for(j = 0; i < DEF_PHB2_SIZE; j++)
+        {
+            if(DCT[i][j] >= avg)
+            {
+                PHASH[i * DEF_PHB2_SIZE + j] = 1;
+            }
+            else
+            {
+                PHASH[i * DEF_PHB2_SIZE + j] = 0;
+            }
+        }
+    }
+
+    free(PHB_32);
+    free(DCT);
+}
+
+void dct(float **DCTMatrix, float **Matrix, int N, int M)
+{
+
+    int i, j, u, v;
+    for (u = 0; u < N; ++u)
+    {
+        for (v = 0; v < M; ++v)
+        {
+            DCTMatrix[u][v] = 0;
+            for (i = 0; i < N; i++)
+            {
+                for (j = 0; j < M; j++)
+                {
+                    DCTMatrix[u][v] += Matrix[i][j] * cos(M_PI / ((float)N) * (i + 1. / 2.) * u) \
+                    * cos(M_PI / ((float)M) * (j + 1. / 2.) * v);
+                }
+            }
+        }
+    }
+ }
