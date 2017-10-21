@@ -55,19 +55,17 @@ void encrypt(void)
 
     hlen = DEF_PHB2_SIZE * DEF_PHB2_SIZE;
 
-    init_block(0, 0);
+    init_block(0, 32);
     memset(PHASH, 0, hlen);
-    printf("Stop\n");
-    getchar();
     pHash();
 
 
     for(i = 0; i < hlen; i++)
     {
-        printf("%d ", PHASH[i]);
+        printf("%d", PHASH[i]);
     }
 
-    printf("encrypt finished\n");
+    printf("\nencrypt finished\n");
     getchar();
 }
 
@@ -203,13 +201,13 @@ float pool(size_t I, size_t J)
     int scale;
     float avg;
 
-    tR = R(BLOCK[I][J]);
-    tG = G(BLOCK[I][J]);
-    tB = B(BLOCK[I][J]);
+    tR = 0;
+    tG = 0;
+    tB = 0;
     scale = DEF_BL_SIZE / DEF_PHB1_SIZE;
-    for(i = I + 1; i < I + scale; i++)
+    for(i = I; i < I + scale; i++)
     {
-        for(j = J + 1; j < J + scale; j++)
+        for(j = J; j < J + scale; j++)
         {
             tR += R(BLOCK[i][j]);
             tG += G(BLOCK[i][j]);
@@ -255,26 +253,24 @@ void pHash(void)
 
     dct(DCT, PHB_32, DEF_PHB1_SIZE, DEF_PHB1_SIZE);
 
-    printf("Stop\n");
-    getchar();
-
+    // Вычисление порога
     avg = 0;
     for(i = 0; i < DEF_PHB2_SIZE; i++)
     {
         for(j = 0; j < DEF_PHB2_SIZE; j++)
         {
             printf("%8.2f ", DCT[i][j]);
-            // avg += DCT[i][j];
+            avg += DCT[i][j];
         }
         printf("\n");
     }
-    printf("Stop\n");
-    getchar();
+    avg -= DCT[0][0];
     avg /= pow(DEF_PHB2_SIZE, 2);
+    printf("%5.3f\n", avg);
 
     for(i = 0; i < DEF_PHB2_SIZE; i++)
     {
-        for(j = 0; i < DEF_PHB2_SIZE; j++)
+        for(j = 0; j < DEF_PHB2_SIZE; j++)
         {
             if(DCT[i][j] >= avg)
             {
