@@ -4,6 +4,7 @@
 #include <setjmp.h>
 #include <math.h>
 #include <string.h>
+#include <time.h>
 
 #define DEF_PATH            "files/"
 #define DEF_PATH_STR_LEN    125
@@ -16,14 +17,18 @@
 #define DEF_BL_SIZE         64
 #define DEF_PHB1_SIZE       32
 #define DEF_PHB2_SIZE       8
-#define DEF_NOF_BL          DEF_IM_WIDTH / DEF_BL_SIZE
+#define DEF_HASH_LEN        (DEF_PHB2_SIZE * DEF_PHB2_SIZE)
+#define DEF_NOF_BL          (DEF_IM_WIDTH / DEF_BL_SIZE)
 
 #define R(X)                (X[0])
 #define G(X)                (X[1])
 #define B(X)                (X[2])
 
-#define ON_K_BIT(X, K)      X | (1 << (K - 1))
-#define OFF_K_BIT(X, K)     X & (~(1 << (K - 1)))
+#define ON_K_BIT(X, K)      (X | (1 << (K - 1)))
+#define OFF_K_BIT(X, K)     (X & (~(1 << (K - 1))))
+
+#define DEF_K2              "=Z;1IE3N+[%065<b'C:K&\9@3@ASF4GbH=+$AHH%6&#NQ)K-&%@L4.L6!7483d&_"
+#define DEF_K2_LEN          64
 
 unsigned char IM[DEF_IM_WIDTH][DEF_IM_HEIGHT][DEF_IM_DIM];
 unsigned char BLOCK[DEF_BL_SIZE][DEF_BL_SIZE][DEF_IM_DIM];
@@ -38,6 +43,7 @@ float pool(size_t I, size_t J);
 void pHash(void);
 void dct(float **DCTMatrix, float **Matrix, int N, int M);
 void lsb(char *key);
+void def_key(void);
 
 int main(void)
 {
@@ -48,6 +54,8 @@ int main(void)
     encrypt();
 
     write_jpg("out.jpg");
+
+    // def_key();
 
     return 0;
 }
@@ -75,7 +83,7 @@ void encrypt(void)
             // }
             // printf("\n");
 
-            lsb("q");
+            lsb(DEF_K2);
 
             for (i = 0; i < DEF_BL_SIZE; i++)
             {
@@ -89,7 +97,7 @@ void encrypt(void)
         }
     }
 
-    printf("encrypt finished\n");
+    printf("\nencrypt finished\n");
     // getchar();
 }
 
@@ -334,15 +342,75 @@ void dct(float **DCTMatrix, float **Matrix, int N, int M)
  }
 
 // LSB без ключа
- void lsb(char *key)
- {
-     size_t i, j;
+void lsb(char *key)
+{
+    size_t i, j, k, p;
 
-     for(i = 0; i < DEF_BL_SIZE; i++)
+    for(k = 0, p = 0; k < DEF_K2_LEN && p < DEF_HASH_LEN; k += 2, p += 2)
+    {
+        i = (size_t)key[k];
+        j = (size_t)key[k + 1];
+        printf("%d %d\n", i, j);
+        (PHASH[p]) ? ON_K_BIT(B(BLOCK[i][j]), 1) : OFF_K_BIT(B(BLOCK[i][j]), 1);
+        (PHASH[p + 1]) ? ON_K_BIT(B(BLOCK[i][j]), 2) : OFF_K_BIT(B(BLOCK[i][j]), 2);
+    }
+}
+
+ void def_key(void)
+ {
+     size_t i, j, step, rt;
+     int k;
+     char ci, cj, add;
+     char key[DEF_HASH_LEN + 1];
+
+     srand(time(0));
+
+     step = 10;
+     add = 33;
+     k = 0;
+     for(i = 0; i < DEF_BL_SIZE; i += step)
      {
-         for(j = 0; j < DEF_BL_SIZE; j++)
+         for(j = 0; j < DEF_BL_SIZE; j += step)
          {
-             (PHASH[i * DEF_BL_SIZE + j]) ? ON_K_BIT(B(BLOCK[i][j]), 1) : OFF_K_BIT(B(BLOCK[i][j]), 1);
+            if(k < DEF_HASH_LEN - 1)
+            {
+                ci = rand() % step + i + add;
+                key[k] = ci;
+                k++;
+                cj = rand() % step + j + add;
+                key[k] = cj;
+                k++;
+            }
+            else
+            {
+                i = DEF_BL_SIZE;
+                j = DEF_BL_SIZE;
+            }
          }
      }
+     key[DEF_HASH_LEN] = '\0';
+     printf("%s\n", key);
+
+     i = 0;
+     while(i < DEF_HASH_LEN * DEF_HASH_LEN)
+     {
+         ci = key[0];
+         cj = key[1];
+
+         rt = rand() % (DEF_HASH_LEN - 3) + 2;
+         if(rt % 2)
+         {
+             rt++;
+         }
+
+         key[0] = key[rt];
+         key[1] = key[rt + 1];
+
+         key[rt] = ci;
+         key[rt + 1] = cj;
+
+         i++;
+     }
+
+     printf("%s\n", key);
  }
