@@ -27,7 +27,7 @@
 #define ON_K_BIT(X, K)      (X | (1 << (K - 1)))
 #define OFF_K_BIT(X, K)     (X & (~(1 << (K - 1))))
 
-#define DEF_K2              "=Z;1IE3N+[%065<b'C:K&\9@3@ASF4GbH=+$AHH%6&#NQ)K-&%@L4.L6!7483d&_"
+#define DEF_K2              "J;34,[B;&\\K1,$'94?0KG3(J!-%AH#=N<-5*$\":CR(NMT,46NAGF=Y@Q>:T\"MYEU"
 #define DEF_K2_LEN          64
 
 unsigned char IM[DEF_IM_WIDTH][DEF_IM_HEIGHT][DEF_IM_DIM];
@@ -56,6 +56,7 @@ int main(void)
     write_jpg("out.jpg");
 
     // def_key();
+    // printf("%s\n", DEF_K2);
 
     return 0;
 }
@@ -348,12 +349,13 @@ void lsb(char *key)
 
     for(k = 0, p = 0; k < DEF_K2_LEN && p < DEF_HASH_LEN; k += 2, p += 2)
     {
-        i = (size_t)key[k];
-        j = (size_t)key[k + 1];
-        printf("%d %d\n", i, j);
+        i = (size_t)key[k] - 33;
+        j = (size_t)key[k + 1] - 33;
+        // printf("%zu %zu\n", i, j);
         (PHASH[p]) ? ON_K_BIT(B(BLOCK[i][j]), 1) : OFF_K_BIT(B(BLOCK[i][j]), 1);
         (PHASH[p + 1]) ? ON_K_BIT(B(BLOCK[i][j]), 2) : OFF_K_BIT(B(BLOCK[i][j]), 2);
     }
+    getchar();
 }
 
  void def_key(void)
@@ -368,9 +370,9 @@ void lsb(char *key)
      step = 10;
      add = 33;
      k = 0;
-     for(i = 0; i < DEF_BL_SIZE; i += step)
+     for(i = 0; i < DEF_BL_SIZE - step; i += step)
      {
-         for(j = 0; j < DEF_BL_SIZE; j += step)
+         for(j = 0; j < DEF_BL_SIZE - step; j += step)
          {
             if(k < DEF_HASH_LEN - 1)
             {
@@ -389,7 +391,7 @@ void lsb(char *key)
          }
      }
      key[DEF_HASH_LEN] = '\0';
-     printf("%s\n", key);
+     printf("%s\n%d\n", key, k);
 
      i = 0;
      while(i < DEF_HASH_LEN * DEF_HASH_LEN)
