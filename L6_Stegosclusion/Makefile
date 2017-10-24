@@ -9,7 +9,7 @@ all: built run clean
 %.o: $(INCDIR) # %.c
 	@gcc $(CFLAGS) $<
 
-built: main.o jpgio.o enct.o
+built: main.o jpgio.o enct.o dect.o
 	@gcc $^ $(LFLAGS) main.out
 
 run:

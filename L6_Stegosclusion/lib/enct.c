@@ -1,30 +1,20 @@
 #include "enct.h"
 
-void encrypt(void)
+void encrypt(char *key)
 {
     size_t i, j, u, v;
-    int hlen;
-
-    hlen = DEF_PHB2_SIZE * DEF_PHB2_SIZE;
 
     for(u = 0; u < DEF_IM_HEIGHT; u += DEF_BL_SIZE)
     {
         for(v = 0; v < DEF_IM_WIDTH; v += DEF_BL_SIZE)
         {
-
-            memset(PHASH, 0, hlen);
+            memset(PHASH, 0, DEF_HASH_LEN);
             clean_block();
 
             init_block(u, v);
             pHash();
 
-            // for(i = 0; i < hlen; i++)
-            // {
-            //     printf("%d", PHASH[i]);
-            // }
-            // printf("\n");
-
-            lsb(DEF_K2);
+            lsb(key);
 
             for (i = 0; i < DEF_BL_SIZE; i++)
             {
@@ -39,38 +29,7 @@ void encrypt(void)
         }
     }
 
-    printf("\nencrypt finished\n");
-    // getchar();
-}
-
-void init_block(size_t x, size_t y)
-{
-    size_t i, j;
-
-    for (i = 0; i < DEF_BL_SIZE; i++)
-    {
-        for(j = 0; j < DEF_BL_SIZE; j++)
-        {
-            R(BLOCK[i][j]) = R(IM[x + i][y + j]);
-            G(BLOCK[i][j]) = G(IM[x + i][y + j]);
-            B(BLOCK[i][j]) = B(IM[x + i][y + j]);
-        }
-    }
-}
-
-void clean_block(void)
-{
-    size_t i, j;
-
-    for(i = 0; i < DEF_BL_SIZE; i++)
-    {
-        for(j = 0; j < DEF_BL_SIZE; j++)
-        {
-            R(BLOCK[i][j]) = 0;
-            G(BLOCK[i][j]) = 0;
-            B(BLOCK[i][j]) = 0;
-        }
-    }
+    printf("encrypt finished\n");
 }
 
 float pool(size_t I, size_t J)
@@ -196,9 +155,12 @@ void lsb(char *key)
 
     for(k = 0, p = 0; k < DEF_K2_LEN && p < DEF_HASH_LEN; k += 2, p += 2)
     {
-        i = (size_t)key[k] - 33;
-        j = (size_t)key[k + 1] - 33;
+        i = (size_t)key[k] - DEF_ADD;
+        j = (size_t)key[k + 1] - DEF_ADD;
         // printf("%zu %zu\n", i, j);
+        // R(BLOCK[i][j]) = 0;
+        // G(BLOCK[i][j]) = 0;
+        // B(BLOCK[i][j]) = 0;
         (PHASH[p]) ? ON_K_BIT(B(BLOCK[i][j]), 1) : OFF_K_BIT(B(BLOCK[i][j]), 1);
         (PHASH[p + 1]) ? ON_K_BIT(B(BLOCK[i][j]), 2) : OFF_K_BIT(B(BLOCK[i][j]), 2);
     }
@@ -209,13 +171,12 @@ void lsb(char *key)
  {
      size_t i, j, step, rt;
      int k;
-     char ci, cj, add;
+     char ci, cj;
      char key[DEF_HASH_LEN + 1];
 
      srand(time(0));
 
      step = 10;
-     add = 33;
      k = 0;
      for(i = 0; i < DEF_BL_SIZE - step; i += step)
      {
@@ -223,10 +184,10 @@ void lsb(char *key)
          {
             if(k < DEF_HASH_LEN - 1)
             {
-                ci = rand() % step + i + add;
+                ci = rand() % step + i + DEF_ADD;
                 key[k] = ci;
                 k++;
-                cj = rand() % step + j + add;
+                cj = rand() % step + j + DEF_ADD;
                 key[k] = cj;
                 k++;
             }
@@ -263,3 +224,58 @@ void lsb(char *key)
 
      printf("%s\n", key);
  }
+
+ int init_block(size_t x, size_t y)
+ {
+     size_t i, j;
+
+     for (i = 0; i < DEF_BL_SIZE; i++)
+     {
+         for(j = 0; j < DEF_BL_SIZE; j++)
+         {
+             R(BLOCK[i][j]) = R(IM[x + i][y + j]);
+             G(BLOCK[i][j]) = G(IM[x + i][y + j]);
+             B(BLOCK[i][j]) = B(IM[x + i][y + j]);
+         }
+     }
+
+     return 0;
+ }
+
+ int clean_block(void)
+ {
+     size_t i, j;
+
+     for(i = 0; i < DEF_BL_SIZE; i++)
+     {
+         for(j = 0; j < DEF_BL_SIZE; j++)
+         {
+             R(BLOCK[i][j]) = 0;
+             G(BLOCK[i][j]) = 0;
+             B(BLOCK[i][j]) = 0;
+         }
+     }
+
+     return 0;
+ }
+
+int setall(void)
+{
+    size_t i, j;
+
+    for(i = 0; i < DEF_IM_HEIGHT; i++)
+    {
+        for(j = 0; j < DEF_IM_WIDTH; j++)
+        {
+            R(IM[i][j]) = 0;
+            G(IM[i][j]) = 0;
+            B(IM[i][j]) = 0;
+        }
+    }
+
+    clean_block();
+
+    memset(PHASH, 0, DEF_HASH_LEN);
+
+    return 0;
+}

@@ -10,11 +10,15 @@
 #include <string.h>
 #include <time.h>
 
-void encrypt(void);
-void init_block(size_t x, size_t y);
-void clean_block(void);
+#define ON_K_BIT(X, K)      (X | (1 << (K - 1)))
+#define OFF_K_BIT(X, K)     (X & (~(1 << (K - 1))))
+
+void encrypt(char *key);
 float pool(size_t I, size_t J);
 void pHash(void);
 void dct(float **DCTMatrix, float **Matrix, int N, int M);
 void lsb(char *key);
 void def_key(void);
+int init_block(size_t x, size_t y);
+int clean_block(void);
+int setall(void);

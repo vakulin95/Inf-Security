@@ -1,21 +1,32 @@
 #include "lib/meta.h"
-#include "lib/enct.h"
 #include "lib/jpgio.h"
+#include "lib/enct.h"
+#include "lib/dect.h"
 
 #include <stdio.h>
 
 int main(void)
 {
-    size_t i, j;
+    //encrypt
+    //--------------------------------------
+    load_jpg("white.jpg");
 
-    load_jpg("in.jpg");
+    encrypt(DEF_K2);
 
-    encrypt();
+    write_jpg("enc_out.jpg");
+    //--------------------------------------
 
-    write_jpg("out.jpg");
+    setall();
 
-    // def_key();
-    // printf("%s\n", DEF_K2);
+    //decrypt
+    //--------------------------------------
+    // load_jpg("enc_out.jpg");
+    //
+    // if(decrypt(DEF_K2))
+    // {
+    //     write_jpg("dec_out.jpg");
+    // }
+    //--------------------------------------
 
     return 0;
 }
