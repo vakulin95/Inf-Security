@@ -2,13 +2,14 @@
 
 CFLAGS = -c -O3
 LFLAGS = -lm -ljpeg -o
+INCDIR = lib/%.c
 
 all: built run clean
 
-%.o: %.c
+%.o: $(INCDIR) # %.c
 	@gcc $(CFLAGS) $<
 
-built: main.o
+built: main.o jpgio.o enct.o
 	@gcc $^ $(LFLAGS) main.out
 
 run:
