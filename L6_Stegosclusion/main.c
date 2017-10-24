@@ -9,23 +9,23 @@ int main(void)
 {
     //encrypt
     //--------------------------------------
-    load_jpg("white.jpg");
+    load_jpg("in.jpg");
 
     encrypt(DEF_K2);
 
     write_jpg("enc_out.jpg");
     //--------------------------------------
 
-    setall();
+    // setall();
 
     //decrypt
     //--------------------------------------
-    // load_jpg("enc_out.jpg");
-    //
-    // if(decrypt(DEF_K2))
-    // {
-    //     write_jpg("dec_out.jpg");
-    // }
+    // load_jpg("in.jpg");
+
+    if(decrypt(DEF_K2))
+    {
+        write_jpg("dec_out.jpg");
+    }
     //--------------------------------------
 
     return 0;
