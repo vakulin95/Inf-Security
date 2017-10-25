@@ -3,24 +3,28 @@
 int decrypt(char *key)
 {
     size_t i, j, u, v;
+    u = 0;
+    v = 0;
 
-    for(u = 0; u < DEF_IM_HEIGHT; u += DEF_BL_SIZE)
-    {
-        for(v = 0; v < DEF_IM_WIDTH; v += DEF_BL_SIZE)
-        {
+    // for(u = 0; u < DEF_IM_HEIGHT; u += DEF_BL_SIZE)
+    // {
+    //     for(v = 0; v < DEF_IM_WIDTH; v += DEF_BL_SIZE)
+    //     {
             memset(PHASH, 0, DEF_HASH_LEN);
             memset(FPHASH, 0, DEF_HASH_LEN);
+            // clean_block();
+
+            // init_block(u, v);
+            // pHash();
+
             clean_block();
-
-            init_block(u, v);
-            pHash();
-
+            init_block_d(u, v);
             fhash(key);
 
-            printf("%d\n", hem_dist());
-            getchar();
-        }
-    }
+            // printf("%d\n", hem_dist());
+            // getchar();
+    //     }
+    // }
 
 
     return 0;
@@ -35,15 +39,16 @@ int fhash(char *key)
         i = (size_t)key[k] - DEF_ADD;
         j = (size_t)key[k + 1] - DEF_ADD;
 
+        // printf("%zu %zu\n", i, j);
         CHECK_K_BIT(B(BLOCK[i][j]), 1) ? (FPHASH[p] = 1) : (FPHASH[p] = 0);
         CHECK_K_BIT(B(BLOCK[i][j]), 2) ? (FPHASH[p + 1] = 1) : (FPHASH[p + 1] = 0);
     }
 
-    // for(i = 0; i < DEF_HASH_LEN; i++)
-    // {
-    //     printf("%d", FPHASH[i]);
-    // }
-    // getchar();
+    for(i = 0; i < DEF_HASH_LEN; i++)
+    {
+        printf("%d", FPHASH[i]);
+    }
+    getchar();
 
     return 0;
 }
@@ -63,4 +68,21 @@ int hem_dist(void)
     }
 
     return Y;
+}
+
+int init_block_d(size_t x, size_t y)
+{
+    size_t i, j;
+
+    for (i = 0; i < DEF_BL_SIZE; i++)
+    {
+        for(j = 0; j < DEF_BL_SIZE; j++)
+        {
+            R(BLOCK[i][j]) = R(IM2[x + i][y + j]);
+            G(BLOCK[i][j]) = G(IM2[x + i][y + j]);
+            B(BLOCK[i][j]) = B(IM2[x + i][y + j]);
+        }
+    }
+
+    return 0;
 }

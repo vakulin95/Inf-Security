@@ -13,7 +13,7 @@ int main(void)
 
     encrypt(DEF_K2);
 
-    write_jpg("enc_out.jpg");
+    // write_jpg("enc_out.jpg");
     //--------------------------------------
 
     // setall();

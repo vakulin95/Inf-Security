@@ -10,8 +10,8 @@
 #include <string.h>
 #include <time.h>
 
-#define ON_K_BIT(X, K)      (X | (1 << (K - 1)))
-#define OFF_K_BIT(X, K)     (X & (~(1 << (K - 1))))
+#define ON_K_BIT(X, K)      (X |= (1 << (K - 1)))
+#define OFF_K_BIT(X, K)     (X &= (~(1 << (K - 1))))
 
 void encrypt(char *key);
 float pool(size_t I, size_t J);
@@ -22,3 +22,4 @@ void def_key(void);
 int init_block(size_t x, size_t y);
 int clean_block(void);
 int setall(void);
+void print_bits(uchar x);
