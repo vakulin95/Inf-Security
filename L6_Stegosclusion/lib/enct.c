@@ -3,8 +3,6 @@
 void encrypt(char *key)
 {
     size_t i, j, u, v;
-    u = 0;
-    v = 0;
 
     for(u = 0; u < DEF_IM_HEIGHT; u += DEF_BL_SIZE)
     {
@@ -16,9 +14,9 @@ void encrypt(char *key)
             init_block(u, v);
             pHash();
 
+            HASH(key);
             // lsb(key);
-
-            kdb(key);
+            // kdb(key);
 
             for (i = 0; i < DEF_BL_SIZE; i++)
             {
@@ -30,6 +28,8 @@ void encrypt(char *key)
                 }
             }
 
+            // u = DEF_IM_HEIGHT;
+            // v = DEF_IM_WIDTH;
         }
     }
 
@@ -210,7 +210,7 @@ int kdb(char *key)
      }
      step = (size_t)(DEF_BL_SIZE / step);
     //  printf("%zu\n", step);
-    // 0 8 16 32
+
      for(k = 0, i = 0; i < DEF_BL_SIZE - step + 1; i += step)
      {
          for(j = 0; j < DEF_BL_SIZE - step + 1; j += step)

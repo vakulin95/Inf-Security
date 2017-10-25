@@ -13,6 +13,14 @@
 #define ON_K_BIT(X, K)      (X |= (1 << (K - 1)))
 #define OFF_K_BIT(X, K)     (X &= (~(1 << (K - 1))))
 
+#ifdef __LSB__
+    #define HASH(key)           lsb(key)
+#endif
+
+#ifdef __KDB__
+    #define HASH(key)           kdb(key)
+#endif
+
 void encrypt(char *key);
 float pool(size_t I, size_t J);
 void pHash(void);
