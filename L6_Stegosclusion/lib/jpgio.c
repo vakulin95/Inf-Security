@@ -59,7 +59,7 @@ void write_jpg(char *filename)
 
     sprintf(path, "%s%s", DEF_PATH, filename);
 
-    out = fopen(path, "w");
+    out = fopen(path, "wb");
 
     /* Compress to JPEG */
     struct jpeg_compress_struct cinfo;

@@ -13,14 +13,14 @@ int main(void)
 
     encrypt(DEF_K2);
 
-    // write_jpg("enc_out.jpg");
+    write_jpg("enc_out.jpg");
     //--------------------------------------
 
     // setall();
 
     //decrypt
     //--------------------------------------
-    // load_jpg("in.jpg");
+    // load_jpg("enc_out.jpg");
 
     if(decrypt(DEF_K2))
     {

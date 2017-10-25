@@ -16,4 +16,3 @@ uchar FPHASH[DEF_HASH_LEN];
 int decrypt(char *key);
 int fhash(char *key);
 int hem_dist(void);
-int init_block_d(size_t x, size_t y);

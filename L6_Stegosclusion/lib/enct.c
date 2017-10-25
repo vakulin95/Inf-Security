@@ -6,10 +6,10 @@ void encrypt(char *key)
     u = 0;
     v = 0;
 
-    // for(u = 0; u < DEF_IM_HEIGHT; u += DEF_BL_SIZE)
-    // {
-    //     for(v = 0; v < DEF_IM_WIDTH; v += DEF_BL_SIZE)
-    //     {
+    for(u = 0; u < DEF_IM_HEIGHT; u += DEF_BL_SIZE)
+    {
+        for(v = 0; v < DEF_IM_WIDTH; v += DEF_BL_SIZE)
+        {
             memset(PHASH, 0, DEF_HASH_LEN);
             clean_block();
 
@@ -22,16 +22,16 @@ void encrypt(char *key)
             {
                 for(j = 0; j < DEF_BL_SIZE; j++)
                 {
-                    R(IM2[u + i][v + j]) = R(BLOCK[i][j]);
-                    G(IM2[u + i][v + j]) = G(BLOCK[i][j]);
-                    B(IM2[u + i][v + j]) = B(BLOCK[i][j]);
+                    R(IM[u + i][v + j]) = R(BLOCK[i][j]);
+                    G(IM[u + i][v + j]) = G(BLOCK[i][j]);
+                    B(IM[u + i][v + j]) = B(BLOCK[i][j]);
                 }
             }
 
-    //     }
-    // }
+        }
+    }
 
-    printf("encrypt finished\n");
+    // printf("encrypt finished\n");
 }
 
 float pool(size_t I, size_t J)
@@ -155,33 +155,20 @@ void lsb(char *key)
 {
     size_t i, j, k, p;
 
-    for(i = 0; i < DEF_HASH_LEN; i++)
-    {
-        printf("%d", PHASH[i]);
-    }
-    printf("\n--------------\n");
+    // for(i = 0; i < DEF_HASH_LEN; i++)
+    // {
+    //     printf("%d", PHASH[i]);
+    // }
+    // printf("\n");
 
     for(k = 0, p = 0; k < DEF_K2_LEN && p < DEF_HASH_LEN; k += 2, p += 2)
     {
         i = (size_t)key[k] - DEF_ADD;
         j = (size_t)key[k + 1] - DEF_ADD;
 
-        // printf("%zu %zu\n", i, j);
-        // R(BLOCK[i][j]) = 0;
-        // G(BLOCK[i][j]) = 0;
-        // B(BLOCK[i][j]) = 0;
-
-        printf("%d %d\n", PHASH[p], PHASH[p + 1]);
-        print_bits(B(BLOCK[i][j]));
-
         (PHASH[p]) ? ON_K_BIT(B(BLOCK[i][j]), 2) : OFF_K_BIT(B(BLOCK[i][j]), 2);
         (PHASH[p + 1]) ? ON_K_BIT(B(BLOCK[i][j]), 1) : OFF_K_BIT(B(BLOCK[i][j]), 1);
-
-        print_bits(B(BLOCK[i][j]));
-        printf("--------------\n");
-        getchar();
     }
-
 }
 
  void def_key(void)

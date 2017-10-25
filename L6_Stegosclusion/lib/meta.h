@@ -27,6 +27,5 @@
 typedef unsigned char uchar;
 
 uchar IM[DEF_IM_WIDTH][DEF_IM_HEIGHT][DEF_IM_DIM];
-uchar IM2[DEF_IM_WIDTH][DEF_IM_HEIGHT][DEF_IM_DIM];
 uchar BLOCK[DEF_BL_SIZE][DEF_BL_SIZE][DEF_IM_DIM];
 uchar PHASH[DEF_HASH_LEN];
