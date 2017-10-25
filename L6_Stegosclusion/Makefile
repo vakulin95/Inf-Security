@@ -3,8 +3,17 @@
 CFLAGS = -c -O3
 LFLAGS = -lm -ljpeg -o
 INCDIR = lib/%.c
+OUTDIR = files/
+
+#=================================#
 
 all: built run clean
+
+enc: built run_e clean
+
+dec: built run_d clean
+
+#---------------------------------#
 
 %.o: $(INCDIR) # %.c
 	@gcc $(CFLAGS) $<
@@ -12,12 +21,21 @@ all: built run clean
 built: main.o jpgio.o enct.o dect.o
 	@gcc $^ $(LFLAGS) main.out
 
+#---------------------------------#
+
 run:
 	@time ./main.out
+
+run_e:
+	@time ./main.out -e
+
+run_d:
+	@time ./main.out -d
+
+#---------------------------------#
 
 clean:
 	@rm -rf *.o *.out
 
 oclean:
-	@cd files
-	@rm -rf *.jpg
+	@rm -rf $(OUTDIR)enc_out.jpg $(OUTDIR)dec_out.jpg

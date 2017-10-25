@@ -3,6 +3,7 @@
 float decrypt(char *key)
 {
     size_t i, j, u, v;
+    int hem;
     float avhem;
 
     avhem = 0;
@@ -18,10 +19,10 @@ float decrypt(char *key)
             pHash();
 
             FHASH(key);
-            // fhash_lsb(key);
-            // fhash_kdb(key);
 
-            avhem += hem_dist();
+            hem = hem_dist();
+            // printf("%d\n", hem);
+            avhem += hem;
         }
     }
     avhem /= pow(DEF_NOF_BL, 2);
