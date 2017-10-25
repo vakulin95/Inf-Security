@@ -20,8 +20,10 @@
 #define G(X)                (X[1])
 #define B(X)                (X[2])
 
-#define DEF_K2              "J;34,[B;&\\K1,$'94?0KG3(J!-%AH#=N<-5*$\":CR(NMT,46NAGF=Y@Q>:T\"MYEU"
-#define DEF_K2_LEN          64
+#define DEF_K2_LSB          "J;34,[B;&\\K1,$'94?0KG3(J!-%AH#=N<-5*$\":CR(NMT,46NAGF=Y@Q>:T\"MYEU"
+#define DEF_K2_LEN_LSB      64
+#define DEF_K2_KDB         "ROKV\\GD]!<S<VUS.=,V\"@_0X_N5F+0TD<I`2-C1(S[]X[*P?A7(]J[MC@@9G\"1CS?Q1++!.`3MN(YZ(D<7#*+=12P)Y<*1OKO7BODB!KA(!V2^(\"A)X3\\\"H=3R:$6@0M"
+#define DEF_K2_LEN_KDB      128
 #define DEF_ADD             33
 
 typedef unsigned char uchar;

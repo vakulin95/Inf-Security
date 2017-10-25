@@ -75,7 +75,7 @@ void write_jpg(char *filename)
     cinfo.in_color_space = JCS_RGB;
 
     jpeg_set_defaults(&cinfo);
-    jpeg_set_quality(&cinfo, DEF_IM_QUALITY, TRUE);
+    jpeg_set_quality(&cinfo, DEF_IM_QUALITY, FALSE);
     jpeg_start_compress(&cinfo, TRUE);
 
     JSAMPROW row_pointer[1];

@@ -16,7 +16,9 @@ void encrypt(char *key)
             init_block(u, v);
             pHash();
 
-            lsb(key);
+            // lsb(key);
+
+            kdb(key);
 
             for (i = 0; i < DEF_BL_SIZE; i++)
             {
@@ -31,7 +33,7 @@ void encrypt(char *key)
         }
     }
 
-    // printf("encrypt finished\n");
+    printf("encrypt finished\n");
 }
 
 float pool(size_t I, size_t J)
@@ -150,7 +152,6 @@ void dct(float **DCTMatrix, float **Matrix, int N, int M)
     }
  }
 
-// LSB без ключа
 void lsb(char *key)
 {
     size_t i, j, k, p;
@@ -161,7 +162,7 @@ void lsb(char *key)
     // }
     // printf("\n");
 
-    for(k = 0, p = 0; k < DEF_K2_LEN && p < DEF_HASH_LEN; k += 2, p += 2)
+    for(k = 0, p = 0; k < DEF_K2_LEN_LSB && p < DEF_HASH_LEN; k += 2, p += 2)
     {
         i = (size_t)key[k] - DEF_ADD;
         j = (size_t)key[k + 1] - DEF_ADD;
@@ -171,22 +172,50 @@ void lsb(char *key)
     }
 }
 
- void def_key(void)
+int kdb(char *key)
+{
+    size_t i, j, k, p;
+    float ld, Y;
+
+    ld = 0.4;
+    for(k = 0, p = 0; k < DEF_K2_LEN_KDB && p < DEF_HASH_LEN; k += 2, p++)
+    {
+        i = (size_t)key[k] - DEF_ADD;
+        j = (size_t)key[k + 1] - DEF_ADD;
+
+        Y = ld * (0.2989 * R(BLOCK[i][j]) + 0.58662 * G(BLOCK[i][j]) + 0.11448 * B(BLOCK[i][j]));
+        (PHASH[p]) ? (B(BLOCK[i][j]) += Y) : (B(BLOCK[i][j]) -= Y);
+    }
+
+    return 0;
+}
+
+ void def_key(int nofpix)
  {
-     size_t i, j, step, rt;
-     int k;
+     size_t i, j, step, rt, mix;
+     int k, keylen;
+     float t;
      char ci, cj;
-     char key[DEF_HASH_LEN + 1];
+
+     keylen = 2 * nofpix + 1;
+     char key[keylen];
 
      srand(time(0));
 
-     step = 10;
-     k = 0;
-     for(i = 0; i < DEF_BL_SIZE - step; i += step)
+     t = sqrt((double)nofpix);
+     step = (size_t)t;
+     if(fmod(t, 1))
      {
-         for(j = 0; j < DEF_BL_SIZE - step; j += step)
+         step++;
+     }
+     step = (size_t)(DEF_BL_SIZE / step);
+    //  printf("%zu\n", step);
+    // 0 8 16 32
+     for(k = 0, i = 0; i < DEF_BL_SIZE - step + 1; i += step)
+     {
+         for(j = 0; j < DEF_BL_SIZE - step + 1; j += step)
          {
-            if(k < DEF_HASH_LEN - 1)
+            if(k < keylen - 2)
             {
                 ci = rand() % step + i + DEF_ADD;
                 key[k] = ci;
@@ -202,16 +231,17 @@ void lsb(char *key)
             }
          }
      }
-     key[DEF_HASH_LEN] = '\0';
+     key[keylen] = '\0';
      printf("%s\n%d\n", key, k);
 
      i = 0;
-     while(i < DEF_HASH_LEN * DEF_HASH_LEN)
+     mix = (size_t)pow(keylen, 4);
+     while(i < mix)
      {
          ci = key[0];
          cj = key[1];
 
-         rt = rand() % (DEF_HASH_LEN - 3) + 2;
+         rt = rand() % (keylen - 4) + 2;
          if(rt % 2)
          {
              rt++;

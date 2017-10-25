@@ -7,25 +7,26 @@
 
 int main(void)
 {
-    //encrypt
-    //--------------------------------------
+    // def_key(64);
+    // encrypt
+    // --------------------------------------
     load_jpg("in.jpg");
 
-    encrypt(DEF_K2);
+    encrypt(DEF_K2_KDB);
 
     write_jpg("enc_out.jpg");
     //--------------------------------------
 
     // setall();
-
-    //decrypt
-    //--------------------------------------
+    //
+    // //decrypt
+    // //--------------------------------------
     // load_jpg("enc_out.jpg");
-
-    if(decrypt(DEF_K2))
-    {
-        write_jpg("dec_out.jpg");
-    }
+    //
+    // if(decrypt(DEF_K2_LSB))
+    // {
+    //     write_jpg("dec_out.jpg");
+    // }
     //--------------------------------------
 
     return 0;

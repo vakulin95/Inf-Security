@@ -15,7 +15,7 @@ int decrypt(char *key)
             init_block(u, v);
             pHash();
 
-            fhash(key);
+            fhash_lsb(key);
 
             printf("%d\n", hem_dist());
             // getchar();
@@ -26,11 +26,11 @@ int decrypt(char *key)
     return 0;
 }
 
-int fhash(char *key)
+int fhash_lsb(char *key)
 {
     size_t i, j, k, p;
 
-    for(k = 0, p = 0; k < DEF_K2_LEN && p < DEF_HASH_LEN; k += 2, p += 2)
+    for(k = 0, p = 0; k < DEF_K2_LEN_LSB && p < DEF_HASH_LEN; k += 2, p += 2)
     {
         i = (size_t)key[k] - DEF_ADD;
         j = (size_t)key[k + 1] - DEF_ADD;
