@@ -21,8 +21,8 @@ float decrypt(char *key)
             FHASH(key);
 
             hem = hem_dist();
-            // printf("%d\n", hem);
             avhem += hem;
+            printf("%d\n", hem);
         }
     }
     avhem /= pow(DEF_NOF_BL, 2);
@@ -52,7 +52,7 @@ int fhash_kdb(char *key)
     size_t i, j, k, p, ia, sig;
     float avB;
 
-    sig = 8;
+    sig = 3;
     for(k = 0, p = 0; k < DEF_K2_LEN_KDB && p < DEF_HASH_LEN; k += 2, p++)
     {
         i = (size_t)key[k] - DEF_ADD;

@@ -1,7 +1,7 @@
 # Makefile
 
 CFLAGS = -c -O3
-LFLAGS = -lm -ljpeg -o
+LFLAGS = -lm -ljpeg -lpng -o
 INCDIR = lib/%.c
 OUTDIR = files/
 
@@ -18,7 +18,7 @@ dec: built run_d clean
 %.o: $(INCDIR) # %.c
 	@gcc $(CFLAGS) $<
 
-built: main.o jpgio.o enct.o dect.o
+built: main.o jpgio.o pngio.o enct.o dect.o
 	@gcc $^ $(LFLAGS) main.out
 
 #---------------------------------#
@@ -38,4 +38,4 @@ clean:
 	@rm -rf *.o *.out
 
 oclean:
-	@rm -rf $(OUTDIR)enc_out.jpg $(OUTDIR)dec_out.jpg
+	@rm -rf $(OUTDIR)enc_out.png $(OUTDIR)dec_out.png
