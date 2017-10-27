@@ -4,12 +4,6 @@
 
 #include "meta.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include <time.h>
-
 #define ON_K_BIT(X, K)      (X |= (1 << (K - 1)))
 #define OFF_K_BIT(X, K)     (X &= (~(1 << (K - 1))))
 

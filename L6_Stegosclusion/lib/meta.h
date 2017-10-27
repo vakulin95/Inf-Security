@@ -2,6 +2,13 @@
     #define __META_H__
 #endif
 
+#include <png.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+#include <time.h>
+
 #define __KDB__
 
 #define DEF_PATH            "files/"
@@ -10,7 +17,7 @@
 #define DEF_INFILE          "in.png"
 #define DEF_ENCFILE         "enc_out.png"
 #define DEF_DECFILE         "dec_out.png"
-#define DEF_AVHEM           20
+#define DEF_AVHEM           10.0
 
 #define DEF_IM_WIDTH        512
 #define DEF_IM_HEIGHT       DEF_IM_WIDTH // 512

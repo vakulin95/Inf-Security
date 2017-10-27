@@ -5,10 +5,6 @@
 #include "meta.h"
 #include "enct.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #define CHECK_K_BIT(X, K)   (X & (1 << (K - 1)))
 
 #ifdef __LSB__
