@@ -27,9 +27,8 @@ int main(int argc, char *argv[])
         {
             return 1;
         }
-        avhem = decrypt(DEF_K2);
-        printf("Heming average:\t%f\n", avhem);
-        if(avhem > DEF_AVHEM)
+
+        if(decrypt(DEF_K2))
         {
             write_png(DEF_DECFILE);
         }
@@ -50,9 +49,8 @@ int main(int argc, char *argv[])
         {
             return 1;
         }
-        avhem = decrypt(DEF_K2);
-        printf("Heming average:\t%f\n", avhem);
-        if(avhem > DEF_AVHEM)
+        
+        if(decrypt(DEF_K2))
         {
             write_png(DEF_DECFILE);
         }

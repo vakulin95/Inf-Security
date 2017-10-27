@@ -9,9 +9,9 @@ LFILES = main.o pngio.o enct.o dect.o
 
 #=================================#
 
-all: oclean built run clean
+all: oclean convpng built run clean
 
-enc: built run_e clean
+enc: oclean convpng built run_e clean
 
 dec: built run_d clean
 
@@ -40,4 +40,7 @@ clean:
 	@rm -rf *.o *.out
 
 oclean:
-	@rm -rf $(OUTDIR)enc_out.png $(OUTDIR)dec_out.png
+	@rm -rf $(OUTDIR)enc_out.png $(OUTDIR)dec_out.png $(OUTDIR)in.png
+
+convpng:
+	@convert $(OUTDIR)*.png -resize 512x512! -define png:color-type=2 -depth 8 $(OUTDIR)in.png

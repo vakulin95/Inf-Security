@@ -83,7 +83,6 @@ void pHash(void)
         DCT[i] = (float*)malloc(sizeof(float) * DEF_PHB1_SIZE);
     }
 
-    // Масштабирование
     scale = DEF_BL_SIZE / DEF_PHB1_SIZE;
     for(i = 0; i < DEF_PHB1_SIZE; i++)
     {
@@ -96,20 +95,16 @@ void pHash(void)
 
     dct(DCT, PHB_32, DEF_PHB1_SIZE, DEF_PHB1_SIZE);
 
-    // Вычисление порога
     avg = 0;
     for(i = 0; i < DEF_PHB2_SIZE; i++)
     {
         for(j = 0; j < DEF_PHB2_SIZE; j++)
         {
-            // printf("%8.2f ", DCT[i][j]);
             avg += DCT[i][j];
         }
-        // printf("\n");
     }
     avg -= DCT[0][0];
     avg /= pow(DEF_PHB2_SIZE, 2);
-    // printf("%5.3f\n", avg);
 
     for(i = 0; i < DEF_PHB2_SIZE; i++)
     {
@@ -156,12 +151,6 @@ void lsb(char *key)
 {
     size_t i, j, k, p;
 
-    // for(i = 0; i < DEF_HASH_LEN; i++)
-    // {
-    //     printf("%d", PHASH[i]);
-    // }
-    // printf("\n");
-
     for(k = 0, p = 0; k < DEF_K2_LEN_LSB && p < DEF_HASH_LEN; k += 2, p += 2)
     {
         i = (size_t)key[k] - DEF_ADD;
@@ -177,7 +166,7 @@ int kdb(char *key)
     size_t i, j, k, p;
     float ld, Y;
 
-    ld = 0.4;
+    ld = DEF_KDB_LDA;
     for(k = 0, p = 0; k < DEF_K2_LEN_KDB && p < DEF_HASH_LEN; k += 2, p++)
     {
         i = (size_t)key[k] - DEF_ADD;
@@ -190,31 +179,33 @@ int kdb(char *key)
     return 0;
 }
 
- void def_key(int nofpix)
- {
-     size_t i, j, step, rt, mix;
-     int k, keylen;
-     float t;
-     char ci, cj;
+void def_key(int nofpix)
+{
+    size_t i, j, step, rt, mix, swind;
+    int k, keylen;
+    float t;
+    char ci, cj;
 
-     keylen = 2 * nofpix + 1;
-     char key[keylen];
+    keylen = 2 * nofpix + 1;
+    char key[keylen];
 
-     srand(time(0));
+    srand(time(0));
 
-     t = sqrt((double)nofpix);
-     step = (size_t)t;
-     if(fmod(t, 1))
-     {
-         step++;
-     }
-     step = (size_t)(DEF_BL_SIZE / step);
-    //  printf("%zu\n", step);
+    t = sqrt((double)nofpix);
+    step = (size_t)t;
+    if(fmod(t, 1))
+    {
+        step++;
+    }
+    swind = DEF_BL_SIZE - DEF_KDB_SIG * 2;
+    step = (size_t)(swind / step);
+    // printf("%zu\n", step);
+    // getchar();
 
-     for(k = 0, i = 0; i < DEF_BL_SIZE - step + 1; i += step)
-     {
-         for(j = 0; j < DEF_BL_SIZE - step + 1; j += step)
-         {
+    for(k = 0, i = DEF_KDB_SIG; i < DEF_BL_SIZE - DEF_KDB_SIG - step + 1; i += step)
+    {
+        for(j = DEF_KDB_SIG; j < DEF_BL_SIZE - DEF_KDB_SIG - step + 1; j += step)
+        {
             if(k < keylen - 2)
             {
                 ci = rand() % step + i + DEF_ADD;
@@ -229,69 +220,70 @@ int kdb(char *key)
                 i = DEF_BL_SIZE;
                 j = DEF_BL_SIZE;
             }
-         }
-     }
-     key[keylen] = '\0';
-     printf("%s\n%d\n", key, k);
+        }
+    }
+    key[keylen] = '\0';
+    printf("%s\n%d\n", key, k);
 
-     i = 0;
-     mix = (size_t)pow(keylen, 4);
-     while(i < mix)
-     {
-         ci = key[0];
-         cj = key[1];
+    i = 0;
+    mix = (size_t)pow(keylen, 4);
+    while(i < mix)
+    {
+        ci = key[0];
+        cj = key[1];
 
-         rt = rand() % (keylen - 4) + 2;
-         if(rt % 2)
-         {
-             rt++;
-         }
+        rt = rand() % (keylen - 4) + 2;
+        if(rt % 2)
+        {
+            rt++;
+        }
 
-         key[0] = key[rt];
-         key[1] = key[rt + 1];
+        key[0] = key[rt];
+        key[1] = key[rt + 1];
 
-         key[rt] = ci;
-         key[rt + 1] = cj;
+        key[rt] = ci;
+        key[rt + 1] = cj;
 
-         i++;
-     }
+        i++;
+    }
 
-     printf("%s\n", key);
- }
+    printf("%s\n", key);
+    getchar();
+}
 
- int init_block(size_t x, size_t y)
- {
-     size_t i, j;
+int init_block(size_t x, size_t y)
+{
+    size_t i, j;
 
-     for (i = 0; i < DEF_BL_SIZE; i++)
-     {
-         for(j = 0; j < DEF_BL_SIZE; j++)
-         {
-             R(BLOCK[i][j]) = R(IM[x + i][y + j]);
-             G(BLOCK[i][j]) = G(IM[x + i][y + j]);
-             B(BLOCK[i][j]) = B(IM[x + i][y + j]);
-         }
-     }
+    for (i = 0; i < DEF_BL_SIZE; i++)
+    {
+        for(j = 0; j < DEF_BL_SIZE; j++)
+        {
+            R(BLOCK[i][j]) = R(IM[x + i][y + j]);
+            G(BLOCK[i][j]) = G(IM[x + i][y + j]);
+            B(BLOCK[i][j]) = B(IM[x + i][y + j]);
+        }
+    }
 
-     return 0;
- }
+    return 0;
+}
 
- int clean_block(void)
- {
-     size_t i, j;
+int clean_block(void)
+{
+    size_t i, j;
 
-     for(i = 0; i < DEF_BL_SIZE; i++)
-     {
-         for(j = 0; j < DEF_BL_SIZE; j++)
-         {
-             R(BLOCK[i][j]) = 0;
-             G(BLOCK[i][j]) = 0;
-             B(BLOCK[i][j]) = 0;
-         }
-     }
+    for(i = 0; i < DEF_BL_SIZE; i++)
+    {
+        for(j = 0; j < DEF_BL_SIZE; j++)
+        {
+            R(BLOCK[i][j]) = 0;
+            G(BLOCK[i][j]) = 0;
+            B(BLOCK[i][j]) = 0;
+        }
+    }
 
-     return 0;
- }
+    return 0;
+}
 
 int setall(void)
 {

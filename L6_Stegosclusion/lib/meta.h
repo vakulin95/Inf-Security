@@ -17,7 +17,7 @@
 #define DEF_INFILE          "in.png"
 #define DEF_ENCFILE         "enc_out.png"
 #define DEF_DECFILE         "dec_out.png"
-#define DEF_AVHEM           10.0
+#define DEF_MAX_HEM         20
 
 #define DEF_IM_WIDTH        512
 #define DEF_IM_HEIGHT       DEF_IM_WIDTH // 512
@@ -30,16 +30,19 @@
 #define DEF_HASH_LEN        (DEF_PHB2_SIZE * DEF_PHB2_SIZE)
 #define DEF_NOF_BL          (DEF_IM_WIDTH / DEF_BL_SIZE)
 
+#define DEF_KDB_SIG         3
+#define DEF_KDB_LDA         0.4
+
 #define R(X)                (X[0])
 #define G(X)                (X[1])
 #define B(X)                (X[2])
 
-#define DEF_K2_LSB          "J;34,[B;&\\K1,$'94?0KG3(J!-%AH#=N<-5*$\":CR(NMT,46NAGF=Y@Q>:T\"MYEU"
-#define DEF_K2_LEN_LSB      64
+#define DEF_K2_LSB          "J01P$X.>KFE5CQ@$3A+HP%C?W+5S6@GH/',/HS,;)';/NHO>+E7$7NF;8Q;>33U2"
+#define DEF_K2_LEN_LSB      DEF_HASH_LEN
 
-#define DEF_K2_KDB          "ROKV\\GD]!<S<VUS.=,V\"@_0X_N5F+0TD<I`2-C1(S[]X[*P?A7(]J[MC@@9G\"1CS"\
-                            "?Q1++!.`3MN(YZ(D<7#*+=12P)Y<*1OKO7BODB!KA(!V2^(\"A)X3\\\"H=3R:$6@0M"
-#define DEF_K2_LEN_KDB      128
+#define DEF_K2_KDB          "F()SQXW+FBUE)X5U8%6D9+)1.W4S'L)91&HM@6>V<6VP$$?=-20JKAK,Y*'8K$9)"\
+                            "EO/:OMB=J6+FHS768.;B.T@[>LP:4I;N)AX>O@V7/-B0DGTT3=N*XMMVQ8J>T+ZV"
+#define DEF_K2_LEN_KDB      DEF_HASH_LEN * 2
 
 #ifdef __LSB__
     #define DEF_K2          DEF_K2_LSB

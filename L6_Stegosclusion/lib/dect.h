@@ -17,7 +17,8 @@
 
 uchar FPHASH[DEF_HASH_LEN];
 
-float decrypt(char *key);
+int decrypt(char *key);
 int fhash_lsb(char *key);
 int fhash_kdb(char *key);
 int hem_dist(void);
+int mark_bl(size_t u, size_t v);

@@ -1,12 +1,13 @@
 #include "dect.h"
 
-float decrypt(char *key)
+int decrypt(char *key)
 {
     size_t i, j, u, v;
-    int hem;
+    int hem, Y;
     float avhem;
 
     avhem = 0;
+    Y = 0;
     for(u = 0; u < DEF_IM_HEIGHT; u += DEF_BL_SIZE)
     {
         for(v = 0; v < DEF_IM_WIDTH; v += DEF_BL_SIZE)
@@ -21,14 +22,21 @@ float decrypt(char *key)
             FHASH(key);
 
             hem = hem_dist();
+            if(hem > DEF_MAX_HEM)
+            {
+                Y++;
+
+                mark_bl(u, v);
+            }
             avhem += hem;
-            // printf("%d\n", hem);
+            // printf("%zu %zu: %d\n", u, v, hem);
         }
     }
     avhem /= pow(DEF_NOF_BL, 2);
 
     printf("decrypt finished\n");
-    return avhem;
+
+    return Y;
 }
 
 int fhash_lsb(char *key)
@@ -52,7 +60,7 @@ int fhash_kdb(char *key)
     size_t i, j, k, p, ia, sig;
     float avB;
 
-    sig = 3;
+    sig = DEF_KDB_SIG;
     for(k = 0, p = 0; k < DEF_K2_LEN_KDB && p < DEF_HASH_LEN; k += 2, p++)
     {
         i = (size_t)key[k] - DEF_ADD;
@@ -100,4 +108,28 @@ int hem_dist(void)
     }
 
     return Y;
+}
+
+int mark_bl(size_t u, size_t v)
+{
+    size_t i, j;
+
+    for (i = 0; i < DEF_BL_SIZE; i++)
+    {
+        for(j = 0; j < DEF_BL_SIZE;)
+        {
+            R(IM[u + i][v + j]) = 0;
+            G(IM[u + i][v + j]) = 0;
+            B(IM[u + i][v + j]) = 0;
+
+            if(i == 0 || i == DEF_BL_SIZE - 1)
+            {
+                j++;
+            }
+            else
+            {
+                j += DEF_BL_SIZE - 1;
+            }
+        }
+    }
 }
