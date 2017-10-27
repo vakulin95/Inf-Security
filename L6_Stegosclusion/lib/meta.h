@@ -7,10 +7,15 @@
 #define DEF_PATH            "files/"
 #define DEF_PATH_STR_LEN    125
 
+#define DEF_INFILE          "in.png"
+#define DEF_ENCFILE         "enc_out.png"
+#define DEF_DECFILE         "dec_out.png"
+#define DEF_AVHEM           20
+
 #define DEF_IM_WIDTH        512
 #define DEF_IM_HEIGHT       DEF_IM_WIDTH // 512
-#define DEF_IM_QUALITY      100
-#define DEF_IM_DIM          3
+#define DEF_IM_BITD         8
+#define DEF_IM_NOFC         3
 
 #define DEF_BL_SIZE         64
 #define DEF_PHB1_SIZE       32
@@ -41,6 +46,6 @@
 
 typedef unsigned char uchar;
 
-uchar IM[DEF_IM_WIDTH][DEF_IM_HEIGHT][DEF_IM_DIM];
-uchar BLOCK[DEF_BL_SIZE][DEF_BL_SIZE][DEF_IM_DIM];
+uchar IM[DEF_IM_WIDTH][DEF_IM_HEIGHT][DEF_IM_NOFC];
+uchar BLOCK[DEF_BL_SIZE][DEF_BL_SIZE][DEF_IM_NOFC];
 uchar PHASH[DEF_HASH_LEN];

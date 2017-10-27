@@ -5,9 +5,11 @@ LFLAGS = -lm -ljpeg -lpng -o
 INCDIR = lib/%.c
 OUTDIR = files/
 
+LFILES = main.o pngio.o enct.o dect.o
+
 #=================================#
 
-all: built run clean
+all: oclean built run clean
 
 enc: built run_e clean
 
@@ -15,10 +17,10 @@ dec: built run_d clean
 
 #---------------------------------#
 
-%.o: $(INCDIR) # %.c
+%.o: $(INCDIR)
 	@gcc $(CFLAGS) $<
 
-built: main.o jpgio.o pngio.o enct.o dect.o
+built: $(LFILES)
 	@gcc $^ $(LFLAGS) main.out
 
 #---------------------------------#

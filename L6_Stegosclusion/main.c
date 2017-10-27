@@ -6,11 +6,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define DEF_INFILE      "in.png"
-#define DEF_ENCFILE     "enc_out.png"
-#define DEF_DECFILE     "dec_out.png"
-#define DEF_AVHEM       20
-
 int main(int argc, char *argv[])
 {
     float avhem;
@@ -39,21 +34,27 @@ int main(int argc, char *argv[])
     else
     {
         setall();
-        load_png(DEF_INFILE);
+        if(load_png(DEF_INFILE))
+        {
+            return 1;
+        }
 
         encrypt(DEF_K2);
 
         write_png(DEF_ENCFILE);
         setall();
 
-        load_png(DEF_ENCFILE);
+        if(load_png(DEF_ENCFILE))
+        {
+            return 1;
+        }
 
         avhem = decrypt(DEF_K2);
         printf("Heming average:\t%f\n", avhem);
-        // if(avhem > DEF_AVHEM)
-        // {
-            // write_png(DEF_ENCFILE);
-        // }
+        if(avhem > DEF_AVHEM)
+        {
+            write_png(DEF_ENCFILE);
+        }
     }
 
     printf("\n----------------------------------------------------------\n\n");

@@ -40,7 +40,7 @@ float pool(size_t I, size_t J)
 {
     size_t i, j;
     uchar tR, tG, tB;
-    uchar R[DEF_IM_DIM];
+    uchar R[DEF_IM_NOFC];
     int scale;
     float avg;
 
@@ -62,7 +62,7 @@ float pool(size_t I, size_t J)
     B(R) = tB / scale;
 
     // Приведение к яркостному представлению
-    avg = (R(R) + G(R) + B(R)) / DEF_IM_DIM;
+    avg = (R(R) + G(R) + B(R)) / DEF_IM_NOFC;
 
     return avg;
 }

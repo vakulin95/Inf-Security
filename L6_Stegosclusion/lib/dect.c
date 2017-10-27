@@ -22,7 +22,7 @@ float decrypt(char *key)
 
             hem = hem_dist();
             avhem += hem;
-            printf("%d\n", hem);
+            // printf("%d\n", hem);
         }
     }
     avhem /= pow(DEF_NOF_BL, 2);
