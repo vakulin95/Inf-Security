@@ -5,7 +5,9 @@
 
 int main(int argc, char *argv[])
 {
-    float avhem;
+    // printf("%s\n", DEF_K2);
+    // getchar();
+    // def_key(64);
 
     printf("\n----------------------------------------------------------\n\n");
 
@@ -49,7 +51,7 @@ int main(int argc, char *argv[])
         {
             return 1;
         }
-        
+
         if(decrypt(DEF_K2))
         {
             write_png(DEF_DECFILE);

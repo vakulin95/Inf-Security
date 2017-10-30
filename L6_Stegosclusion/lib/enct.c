@@ -208,10 +208,10 @@ void def_key(int nofpix)
         {
             if(k < keylen - 2)
             {
-                ci = rand() % step + i + DEF_ADD;
+                ci = rand() % (step - DEF_KDB_SIG) + i + DEF_ADD;
                 key[k] = ci;
                 k++;
-                cj = rand() % step + j + DEF_ADD;
+                cj = rand() % (step - DEF_KDB_SIG) + j + DEF_ADD;
                 key[k] = cj;
                 k++;
             }

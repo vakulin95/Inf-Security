@@ -4,9 +4,7 @@ int decrypt(char *key)
 {
     size_t i, j, u, v;
     int hem, Y;
-    float avhem;
 
-    avhem = 0;
     Y = 0;
     for(u = 0; u < DEF_IM_HEIGHT; u += DEF_BL_SIZE)
     {
@@ -25,14 +23,10 @@ int decrypt(char *key)
             if(hem > DEF_MAX_HEM)
             {
                 Y++;
-
                 mark_bl(u, v);
             }
-            avhem += hem;
-            // printf("%zu %zu: %d\n", u, v, hem);
         }
     }
-    avhem /= pow(DEF_NOF_BL, 2);
 
     printf("decrypt finished\n");
 
