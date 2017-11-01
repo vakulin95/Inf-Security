@@ -1,9 +1,11 @@
 $ cat .gitignore
 
-#GitIgnore file 8.04.17
+# GitIgnore file 8.04.17
 
 *.[oa]
 *.exe
 *.out
 *.gch
 *.dat
+*.png
+*.jpg

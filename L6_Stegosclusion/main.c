@@ -33,6 +33,11 @@ int main(int argc, char *argv[])
         if(decrypt(DEF_K2))
         {
             write_png(DEF_DECFILE);
+            printf("\nAuthentication: False\n");
+        }
+        else
+        {
+            printf("\nAuthentication: True\n");
         }
     }
     else
@@ -55,6 +60,11 @@ int main(int argc, char *argv[])
         if(decrypt(DEF_K2))
         {
             write_png(DEF_DECFILE);
+            printf("\nAuthentication: False\n");
+        }
+        else
+        {
+            printf("\nAuthentication: True\n");
         }
     }
 
