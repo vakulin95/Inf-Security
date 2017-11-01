@@ -173,8 +173,40 @@ int kdb(char *key)
         j = (size_t)key[k + 1] - DEF_ADD;
 
         Y = ld * (0.2989 * R(BLOCK[i][j]) + 0.58662 * G(BLOCK[i][j]) + 0.11448 * B(BLOCK[i][j]));
-        (PHASH[p]) ? (B(BLOCK[i][j]) += Y) : (B(BLOCK[i][j]) -= Y);
+        Y = roundf(Y);
+
+        if(PHASH[p])
+        {
+            // printf("%d + %d = ", B(BLOCK[i][j]), (uchar)Y);
+            if(UCHAR_MAX - (uchar)Y >= B(BLOCK[i][j]))
+            {
+                B(BLOCK[i][j]) += (uchar)Y;
+            }
+            else
+            {
+                B(BLOCK[i][j]) = 255;
+            }
+            // printf("%d\n", B(BLOCK[i][j]));
+        }
+        else
+        {
+            // printf("%d - %d = ", B(BLOCK[i][j]), (uchar)Y);
+            if((uchar)Y <= B(BLOCK[i][j]))
+            {
+                B(BLOCK[i][j]) -= (uchar)Y;
+            }
+            else
+            {
+
+                B(BLOCK[i][j]) = 0;
+            }
+            // printf("%d\n", B(BLOCK[i][j]));
+        }
+        // R(BLOCK[i][j]) = 0;
+        // G(BLOCK[i][j]) = 0;
+        // B(BLOCK[i][j]) = 0;
     }
+    // getchar();
 
     return 0;
 }

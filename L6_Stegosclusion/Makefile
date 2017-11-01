@@ -40,7 +40,12 @@ clean:
 	@rm -rf *.o *.out
 
 oclean:
-	@rm -rf $(OUTDIR)enc_out.png $(OUTDIR)dec_out.png $(OUTDIR)in.png
+	@rm -rf $(OUTDIR)*.png
 
 convpng:
-	@convert $(OUTDIR)*.png -resize 512x512! -define png:color-type=2 -depth 8 $(OUTDIR)in.png
+ifeq ($(words $(wildcard *.png)), 1)
+	@convert *.png -resize 512x512! -define png:color-type=2 -depth 8 $(OUTDIR)in.png
+else
+	@echo "More than one input file!";
+	@exit 2;
+endif

@@ -9,7 +9,7 @@
 #include <string.h>
 #include <time.h>
 
-#define __LSB__
+#define __KDB__
 
 #define DEF_PATH            "files/"
 #define DEF_PATH_STR_LEN    125
@@ -29,8 +29,8 @@
 #define DEF_HASH_LEN        (DEF_PHB2_SIZE * DEF_PHB2_SIZE)
 #define DEF_NOF_BL          (DEF_IM_WIDTH / DEF_BL_SIZE)
 
-#define DEF_KDB_SIG         5
-#define DEF_KDB_LDA         0.4
+#define DEF_KDB_SIG         1
+#define DEF_KDB_LDA         0.3
 
 #define R(X)                (X[0])
 #define G(X)                (X[1])
@@ -43,7 +43,7 @@
 #define DEF_K2_KDB          "P4QJ%C4UBAU-N&9GJ:+HB:+AOOIQ'UGWVI4B.V4+9,%,5PI&<;UU39X$;QUOQXQ@"\
                             "JCHH.++%<%XABXO:$:CI;W'42$-P@OX<45J2-3;CB-C2'&%JU2C$+:5H;2N.'OH,"
 #define DEF_K2_LEN_KDB      DEF_HASH_LEN * 2
-#define DEF_MAX_HEM_KDB     23
+#define DEF_MAX_HEM_KDB     8
 
 #ifdef __LSB__
     #define DEF_K2          DEF_K2_LSB

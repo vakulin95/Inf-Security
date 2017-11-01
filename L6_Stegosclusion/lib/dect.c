@@ -64,12 +64,20 @@ int fhash_kdb(char *key)
         ((int)(i - sig) > 0) ? (ia = i - sig) : (ia = 0);
         for(; (ia <= i + sig) && (ia < DEF_BL_SIZE); ia++)
         {
+            if(ia == i)
+            {
+                continue;
+            }
             avB += (float)B(BLOCK[ia][j]);
         }
 
         ((int)(j - sig) > 0) ? (ia = j - sig) : (ia = 0);
         for(; (ia <= j + sig) && (ia < DEF_BL_SIZE); ia++)
         {
+            if(ia == j)
+            {
+                continue;
+            }
             avB += (float)B(BLOCK[i][ia]);
         }
         avB /= (float)(4 * sig);
@@ -112,7 +120,7 @@ int mark_bl(size_t u, size_t v)
     {
         for(j = 0; j < DEF_BL_SIZE;)
         {
-            R(IM[u + i][v + j]) = 0;
+            R(IM[u + i][v + j]) = 255;
             G(IM[u + i][v + j]) = 0;
             B(IM[u + i][v + j]) = 0;
 
