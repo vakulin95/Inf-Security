@@ -1,9 +1,11 @@
 # Makefile
 
 CFLAGS = -c -O3
-LFLAGS = -lm -ljpeg -lpng -o
+LFLAGS = -lm -lz -lpng -o
 INCDIR = lib/%.c
 OUTDIR = files/
+
+THIS_FILE := $(lastword $(MAKEFILE_LIST))
 
 LFILES = main.o pngio.o enct.o dect.o
 
@@ -26,13 +28,13 @@ built: $(LFILES)
 #---------------------------------#
 
 run:
-	@time ./main.out
+	@time ./main.out || $(MAKE) -f $(THIS_FILE) clean
 
 run_e:
-	@time ./main.out -e
+	@time ./main.out -e || $(MAKE) -f $(THIS_FILE) clean
 
 run_d:
-	@time ./main.out -d
+	@time ./main.out -d || $(MAKE) -f $(THIS_FILE) clean
 
 #---------------------------------#
 

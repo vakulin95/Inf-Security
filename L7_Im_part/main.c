@@ -21,6 +21,9 @@ int main(int argc, char *argv[])
         {
             return 1;
         }
+
+        encrypt();
+
         write_png(DEF_ENCFILE);
     }
 
