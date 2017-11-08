@@ -7,7 +7,8 @@
 #define ON_K_BIT(X, K)      (X |= (1 << (K - 1)))
 #define OFF_K_BIT(X, K)     (X &= (~(1 << (K - 1))))
 
-int mcompress(void);
+uInt mcompress(void);
+void mdecompress(void);
 int encrypt(void);
 int init_block(size_t x, size_t y);
 int set_block(size_t x, size_t y);

@@ -2,140 +2,93 @@
 
 #include "zlib.h"
 
-int mcompress(void)
+uInt mcompress(void)
 {
-    size_t i;
-    uInt len;
-    uchar a[2 * DEF_BL_SIZE];
-
-    for(i = 0; i < DEF_BL_SIZE; i++)
-    {
-        a[i] = G(BLOCK[1][i]);
-    }
-
-    uchar b[2 * DEF_BL_SIZE];
-    uchar c[2 * DEF_BL_SIZE];
-
-
-    // original string len = 36
-    // char a[50] = "Hello Hello Hello Hello Hello Hello!";
-
-    // placeholder for the compressed (deflated) version of "a"
-    // char b[50];
-
-    // placeholder for the UNcompressed (inflated) version of "b"
-    // char c[50];
-
-
-    // printf("Uncompressed size is: %lu\n", strlen(a));
-    // printf("Uncompressed string is: %s\n", a);
-
-    // printf("Uncompressed size is: %lu\n", DEF_BL_SIZE);
-    // for(i = 0; i < DEF_BL_SIZE; i++)
-    // {
-    //     printf("%d - %d\n", i, a[i]);
-    // }
-    //
-    // printf("\n----------\n\n");
-
-    // STEP 1.
-    // deflate a into b. (that is, compress a into b)
-
-    // zlib struct
     z_stream defstream;
     defstream.zalloc = Z_NULL;
     defstream.zfree = Z_NULL;
     defstream.opaque = Z_NULL;
     // setup "a" as the input and "b" as the compressed output
-    defstream.avail_in = (uInt)(DEF_BL_SIZE); // size of input, string + terminator
-    defstream.next_in = (Bytef *)a; // input char array
-    defstream.avail_out = (uInt)(sizeof(b)); // size of output
-    defstream.next_out = (Bytef *)b; // output char array
+    defstream.avail_in = (uInt)(DEF_BL_SIZE * DEF_BL_SIZE * DEF_IM_NOFC); // size of input, string + terminator
+    defstream.next_in = (Bytef *)BLOCK1; // input char array
+    defstream.avail_out = (uInt)(sizeof(COMP_BLOCK)); // size of output
+    defstream.next_out = (Bytef *)COMP_BLOCK; // output char array
 
-    // the actual compression work.
-    deflateInit(&defstream, Z_BEST_COMPRESSION);
+    deflateInit2(&defstream, Z_BEST_COMPRESSION, Z_DEFLATED, 8, 1, 4);
     deflate(&defstream, Z_FINISH);
-    len = defstream.avail_out;
     deflateEnd(&defstream);
 
-    // This is one way of getting the size of the output
-    // printf("Compressed size is: %lu\n", strlen(b));
-    // printf("Compressed string is: %s\n", b);
-
-    printf("Compressed size is: %u\n", len);
-    // for(i = 0; i < len; i++)
-    // {
-    //     printf("%d\n", b[i]);
-    // }
-
+    printf("Input size is:\t\t%lu\n", sizeof(BLOCK1));
+    printf("Compressed size is:\t%u\n", defstream.avail_out);
     printf("\n----------\n\n");
 
+    return defstream.avail_out;
+}
 
-    // STEP 2.
-    // inflate b into c
-    // zlib struct
+void mdecompress(void)
+{
+    size_t i;
+
     z_stream infstream;
     infstream.zalloc = Z_NULL;
     infstream.zfree = Z_NULL;
     infstream.opaque = Z_NULL;
     // setup "b" as the input and "c" as the compressed output
-    infstream.avail_in = (uInt)((uchar*)defstream.next_out - b); // size of input
-    infstream.next_in = (Bytef *)b; // input char array
-    infstream.avail_out = (uInt)(sizeof(c)); // size of output
-    infstream.next_out = (Bytef *)c; // output char array
+    infstream.avail_in = sizeof(COMP_BLOCK); // size of input
+    infstream.next_in = (Bytef *)COMP_BLOCK; // input char array
+    infstream.avail_out = (uInt)(sizeof(DECOMP_BLOCK)); // size of output
+    infstream.next_out = (Bytef *)DECOMP_BLOCK; // output char array
 
     // the actual DE-compression work.
     inflateInit(&infstream);
     inflate(&infstream, Z_NO_FLUSH);
     inflateEnd(&infstream);
 
-    // printf("Uncompressed size is: %lu\n", strlen(c));
-    // printf("Uncompressed string is: %s\n", c);
-
-    printf("Uncompressed size is: %u\n", infstream.avail_out);
-    for(i = 0; i < DEF_BL_SIZE; i++)
+    printf("Uncompressed size is:\t%u\n", infstream.avail_out);
+    for(i = 0; i < DEF_BL_SIZE * DEF_BL_SIZE * DEF_IM_NOFC; i++)
     {
-        printf("%zu\t- %d | %d\n", i, a[i], c[i]);
-        if(a[i] != c[i])
+        // printf("%zu\t- %d | %d\n", i, BLOCK1[i], DECOMP_BLOCK[i]);
+        if(BLOCK1[i] != DECOMP_BLOCK[i])
         {
             printf("FALSE!\n");
-            break;
+            exit(1);
         }
     }
-
-
-
-    return 0;
+    printf("\n----------\n\n");
 }
 
 int encrypt(void)
 {
-    size_t i, j;
+    size_t i, j, k;
+    uInt len;
 
     init_block(DEF_X_OFFSET, DEF_Y_OFFSET);
 
-    mcompress();
+    len = mcompress();
+    mdecompress();
 
-    // for (i = 0; i < DEF_BL_SIZE; i++)
-    // {
-    //     for(j = 0; j < DEF_BL_SIZE; j++)
-    //     {
-    //         R(BLOCK[i][j]) = 0;
-    //         G(BLOCK[i][j]) = 0;
-    //         B(BLOCK[i][j]) = 0;
-    //     }
-    // }
+    for (i = 0; i < DEF_BL_SIZE; i++)
+    {
+        for(j = 0; j < DEF_BL_SIZE; j++)
+        {
+            R(BLOCK[i][j]) = 0;
+            G(BLOCK[i][j]) = 0;
+            B(BLOCK[i][j]) = 0;
+
+            // R(BLOCK[i][j]) = DECOMP_BLOCK[i * DEF_BL_SIZE + j];
+            // G(BLOCK[i][j]) = DECOMP_BLOCK[i * DEF_BL_SIZE + j + DEF_BL_SIZE * DEF_BL_SIZE];
+            // B(BLOCK[i][j]) = DECOMP_BLOCK[i * DEF_BL_SIZE + j + 2 * DEF_BL_SIZE * DEF_BL_SIZE];
+        }
+    }
 
     set_block(DEF_X_OFFSET, DEF_Y_OFFSET);
-
-
 
     return 0;
 }
 
 int init_block(size_t x, size_t y)
 {
-    size_t i, j;
+    size_t i, j, k;
 
     if(x + DEF_BL_SIZE > DEF_IM_WIDTH || y + DEF_BL_SIZE > DEF_IM_HEIGHT)
     {
@@ -150,6 +103,11 @@ int init_block(size_t x, size_t y)
             R(BLOCK[i][j]) = R(IM[y + i][x + j]);
             G(BLOCK[i][j]) = G(IM[y + i][x + j]);
             B(BLOCK[i][j]) = B(IM[y + i][x + j]);
+
+            BLOCK1[i * DEF_BL_SIZE + j]                     = R(IM[y + i][x + j]);
+            BLOCK1[i * DEF_BL_SIZE + j + DEF_BL_SIZE * DEF_BL_SIZE]       = G(IM[y + i][x + j]);
+            BLOCK1[i * DEF_BL_SIZE + j + 2 * DEF_BL_SIZE * DEF_BL_SIZE]   = B(IM[y + i][x + j]);
+            // printf("%zu %zu %zu\n", i * DEF_BL_SIZE + j, i * DEF_BL_SIZE + j + DEF_BL_SIZE * DEF_BL_SIZE, i * DEF_BL_SIZE + j + 2 * DEF_BL_SIZE * DEF_BL_SIZE);
         }
     }
 

@@ -25,11 +25,14 @@
 #define G(X)                (X[1])
 #define B(X)                (X[2])
 
-#define DEF_BL_SIZE         64
-#define DEF_X_OFFSET        224
-#define DEF_Y_OFFSET        224
+#define DEF_BL_SIZE         200
+#define DEF_X_OFFSET        10//(int)(DEF_IM_WIDTH / 2.0 - DEF_BL_SIZE / 2.0)
+#define DEF_Y_OFFSET        10//(int)(DEF_IM_HEIGHT / 2.0 - DEF_BL_SIZE / 2.0)
 
 typedef unsigned char uchar;
 
 uchar IM[DEF_IM_WIDTH][DEF_IM_HEIGHT][DEF_IM_NOFC];
 uchar BLOCK[DEF_BL_SIZE][DEF_BL_SIZE][DEF_IM_NOFC];
+uchar BLOCK1[DEF_BL_SIZE * DEF_BL_SIZE * DEF_IM_NOFC];
+uchar COMP_BLOCK[DEF_BL_SIZE * DEF_BL_SIZE * DEF_IM_NOFC * 2];
+uchar DECOMP_BLOCK[DEF_BL_SIZE * DEF_BL_SIZE * DEF_IM_NOFC * 2];
