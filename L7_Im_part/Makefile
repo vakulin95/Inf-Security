@@ -7,7 +7,7 @@ OUTDIR = files/
 
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
 
-LFILES = main.o pngio.o enct.o dect.o
+LFILES = main.o pngio.o enct.o dect.o feistel.o
 
 #=================================#
 

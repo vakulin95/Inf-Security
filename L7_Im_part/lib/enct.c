@@ -1,16 +1,93 @@
 #include "enct.h"
+#include "feistel.h"
 
-#include "zlib.h"
+int encrypt(void)
+{
+    size_t i, j, k;
+    int64 mes, enc;
+    uchar *buf;
+
+    init_block(DEF_X_OFFSET, DEF_Y_OFFSET);
+
+    COMP_LEN = mcompress();
+
+    buf = (uchar*)malloc(sizeof(uchar) * DEF_MES_LEN);
+
+    for(i = 0; i < COMP_LEN; i += DEF_MES_LEN)
+    {
+        mes = conv_str(COMP_BLOCK + i);
+        enc = fl_hide(mes);
+
+        conv_int(enc, &buf);
+        for(j = i; j < i + DEF_MES_LEN; j++)
+        {
+            COMP_BLOCK[j] = buf[j % DEF_MES_LEN];
+        }
+        memset(buf, 0, DEF_MES_LEN);
+    }
+
+    lsb(DEF_K2_LSB);
+
+    set_block(DEF_X_OFFSET, DEF_Y_OFFSET);
+
+    free(buf);
+
+    return 0;
+}
+
+int lsb(int key)
+{
+    size_t i, j, k, p;
+
+    p = 0;
+    for(i = 0; i < DEF_IM_HEIGHT; i += key)
+    {
+        for(j = 0; j < DEF_IM_WIDTH; j += key)
+        {
+            for(k = 0; k < DEF_IM_NOFC; k++)
+            {
+                if((i > DEF_Y_OFFSET - 2 * key && i < DEF_Y_OFFSET + DEF_BL_SIZE + 2 * key) \
+                && (j > DEF_X_OFFSET - 2 * key && j < DEF_X_OFFSET + DEF_BL_SIZE + 2 * key))
+                {
+                    continue;
+                }
+
+                if(p < COMP_LEN - 1)
+                {
+                    (COMP_BLOCK[p++]) ? ON_K_BIT(IM[i][j][k], 2) : OFF_K_BIT(IM[i][j][k], 2);
+                    (COMP_BLOCK[p++]) ? ON_K_BIT(IM[i][j][k], 1) : OFF_K_BIT(IM[i][j][k], 1);
+                }
+                else
+                {
+                    i = DEF_IM_HEIGHT;
+                    j = DEF_IM_WIDTH;
+                    k = DEF_IM_NOFC;
+                }
+            }
+        }
+    }
+
+    if(p < COMP_LEN)
+    {
+        printf("DEF_K2_LSB is too large!\n");
+        exit(1);
+    }
+
+    return 0;
+}
 
 uInt mcompress(void)
 {
+    size_t i;
+    uInt len;
+
     z_stream defstream;
     defstream.zalloc = Z_NULL;
     defstream.zfree = Z_NULL;
     defstream.opaque = Z_NULL;
     // setup "a" as the input and "b" as the compressed output
     defstream.avail_in = (uInt)(DEF_BL_SIZE * DEF_BL_SIZE * DEF_IM_NOFC); // size of input, string + terminator
-    defstream.next_in = (Bytef *)BLOCK1; // input char array
+    defstream.next_in = (Bytef *)BLOCK; // input char array
     defstream.avail_out = (uInt)(sizeof(COMP_BLOCK)); // size of output
     defstream.next_out = (Bytef *)COMP_BLOCK; // output char array
 
@@ -18,11 +95,21 @@ uInt mcompress(void)
     deflate(&defstream, Z_FINISH);
     deflateEnd(&defstream);
 
-    printf("Input size is:\t\t%lu\n", sizeof(BLOCK1));
-    printf("Compressed size is:\t%u\n", defstream.avail_out);
-    printf("\n----------\n\n");
+    len = defstream.avail_out;
+    if(defstream.avail_out % 8)
+    {
+        len = defstream.avail_out + (8 - (defstream.avail_out % 8));
+        for(i = defstream.avail_out; i < len; i++)
+        {
+            COMP_BLOCK[i] = 0;
+        }
+    }
 
-    return defstream.avail_out;
+    printf("Input size is:\t\t%lu\n", sizeof(BLOCK));
+    printf("Compressed size is:\t%u\n", len);
+    printf("\n----------\n");
+
+    return len;
 }
 
 void mdecompress(void)
@@ -47,43 +134,14 @@ void mdecompress(void)
     printf("Uncompressed size is:\t%u\n", infstream.avail_out);
     for(i = 0; i < DEF_BL_SIZE * DEF_BL_SIZE * DEF_IM_NOFC; i++)
     {
-        // printf("%zu\t- %d | %d\n", i, BLOCK1[i], DECOMP_BLOCK[i]);
-        if(BLOCK1[i] != DECOMP_BLOCK[i])
+        // printf("%zu\t- %d | %d\n", i, BLOCK[i], DECOMP_BLOCK[i]);
+        if(BLOCK[i] != DECOMP_BLOCK[i])
         {
             printf("FALSE!\n");
             exit(1);
         }
     }
     printf("\n----------\n\n");
-}
-
-int encrypt(void)
-{
-    size_t i, j, k;
-    uInt len;
-
-    init_block(DEF_X_OFFSET, DEF_Y_OFFSET);
-
-    len = mcompress();
-    mdecompress();
-
-    for (i = 0; i < DEF_BL_SIZE; i++)
-    {
-        for(j = 0; j < DEF_BL_SIZE; j++)
-        {
-            R(BLOCK[i][j]) = 0;
-            G(BLOCK[i][j]) = 0;
-            B(BLOCK[i][j]) = 0;
-
-            // R(BLOCK[i][j]) = DECOMP_BLOCK[i * DEF_BL_SIZE + j];
-            // G(BLOCK[i][j]) = DECOMP_BLOCK[i * DEF_BL_SIZE + j + DEF_BL_SIZE * DEF_BL_SIZE];
-            // B(BLOCK[i][j]) = DECOMP_BLOCK[i * DEF_BL_SIZE + j + 2 * DEF_BL_SIZE * DEF_BL_SIZE];
-        }
-    }
-
-    set_block(DEF_X_OFFSET, DEF_Y_OFFSET);
-
-    return 0;
 }
 
 int init_block(size_t x, size_t y)
@@ -100,14 +158,9 @@ int init_block(size_t x, size_t y)
     {
         for(j = 0; j < DEF_BL_SIZE; j++)
         {
-            R(BLOCK[i][j]) = R(IM[y + i][x + j]);
-            G(BLOCK[i][j]) = G(IM[y + i][x + j]);
-            B(BLOCK[i][j]) = B(IM[y + i][x + j]);
-
-            BLOCK1[i * DEF_BL_SIZE + j]                     = R(IM[y + i][x + j]);
-            BLOCK1[i * DEF_BL_SIZE + j + DEF_BL_SIZE * DEF_BL_SIZE]       = G(IM[y + i][x + j]);
-            BLOCK1[i * DEF_BL_SIZE + j + 2 * DEF_BL_SIZE * DEF_BL_SIZE]   = B(IM[y + i][x + j]);
-            // printf("%zu %zu %zu\n", i * DEF_BL_SIZE + j, i * DEF_BL_SIZE + j + DEF_BL_SIZE * DEF_BL_SIZE, i * DEF_BL_SIZE + j + 2 * DEF_BL_SIZE * DEF_BL_SIZE);
+            BLOCK[i * DEF_BL_SIZE + j]                                 = R(IM[y + i][x + j]);
+            BLOCK[i * DEF_BL_SIZE + j + DEF_BL_SIZE * DEF_BL_SIZE]     = G(IM[y + i][x + j]);
+            BLOCK[i * DEF_BL_SIZE + j + 2 * DEF_BL_SIZE * DEF_BL_SIZE] = B(IM[y + i][x + j]);
         }
     }
 
@@ -128,26 +181,9 @@ int set_block(size_t x, size_t y)
     {
         for(j = 0; j < DEF_BL_SIZE; j++)
         {
-            R(IM[y + i][x + j]) = R(BLOCK[i][j]);
-            G(IM[y + i][x + j]) = G(BLOCK[i][j]);
-            B(IM[y + i][x + j]) = B(BLOCK[i][j]);
-        }
-    }
-
-    return 0;
-}
-
-int clean_block(void)
-{
-    size_t i, j;
-
-    for(i = 0; i < DEF_BL_SIZE; i++)
-    {
-        for(j = 0; j < DEF_BL_SIZE; j++)
-        {
-            R(BLOCK[i][j]) = 0;
-            G(BLOCK[i][j]) = 0;
-            B(BLOCK[i][j]) = 0;
+            R(IM[y + i][x + j]) = 0;
+            G(IM[y + i][x + j]) = 0;
+            B(IM[y + i][x + j]) = 0;
         }
     }
 
@@ -168,7 +204,16 @@ int setall(void)
         }
     }
 
-    clean_block();
+    for(i = 0; i < DEF_BL_LEN; i++)
+    {
+        BLOCK[i] = 0;
+    }
+
+    for(i = 0; i < DEF_BL_LEN * 2; i++)
+    {
+        COMP_BLOCK[i] = 0;
+        DECOMP_BLOCK[i] = 0;
+    }
 
     return 0;
 }
