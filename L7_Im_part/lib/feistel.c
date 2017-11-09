@@ -55,7 +55,7 @@ int64 fl_show(int64 message)
 	return join_parts(P);
 }
 
-int64 conv_str(uchar str[DEF_MES_LEN])
+int64 conv_str(unsigned char str[DEF_MES_LEN])
 {
     int i;
     int64 Y = 0;
@@ -68,13 +68,13 @@ int64 conv_str(uchar str[DEF_MES_LEN])
     return Y;
 }
 
-void conv_int(int64 X, uchar **str)
+void conv_int(int64 X, unsigned char **str)
 {
     int i;
 
     for(i = 0; i < DEF_MES_LEN; i++)
     {
-        (*str)[DEF_MES_LEN - i - 1] = (uchar)(X >> (i * 8));
+        (*str)[DEF_MES_LEN - i - 1] = (unsigned char)(X >> (i * 8));
     }
     // (*str)[DEF_MES_LEN - 1] = '\0';
 

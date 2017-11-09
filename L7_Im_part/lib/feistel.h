@@ -2,7 +2,9 @@
     #define __FEISTEL_H__
 #endif
 
-#include "meta.h"
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
 
 #define DEF_ROUNDS              10
 #define DEF_MES_LEN             8
@@ -26,8 +28,8 @@ int16 KEYS[DEF_ROUNDS];
 
 int64 fl_hide(int64 message);
 int64 fl_show(int64 message);
-int64 conv_str(uchar str[DEF_MES_LEN]);
-void conv_int(int64 X, uchar **str);
+int64 conv_str(unsigned char str[DEF_MES_LEN]);
+void conv_int(int64 X, unsigned char **str);
 void cr_keys(void);
 int64 join_parts(int16 *part);
 int16 gen_func(int16 *part, int16 key);

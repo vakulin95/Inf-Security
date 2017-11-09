@@ -1,15 +1,29 @@
 #include "enct.h"
-#include "feistel.h"
 
 int encrypt(void)
 {
-    size_t i, j, k;
+    init_block(DEF_X_OFFSET, DEF_Y_OFFSET);
+
+    mcompress();
+    fbl();
+    lsb(DEF_K2_LSB);
+
+    set_block(DEF_X_OFFSET, DEF_Y_OFFSET);
+
+    return 0;
+}
+
+int fbl(void)
+{
+    size_t i, j;
     int64 mes, enc;
     uchar *buf;
 
-    init_block(DEF_X_OFFSET, DEF_Y_OFFSET);
-
-    COMP_LEN = mcompress();
+    // for(i = COMP_LEN - 20; i < COMP_LEN; i++)
+    // {
+    //     printf("%d- %d\n", i, COMP_BLOCK[i]);
+    // }
+    // printf("-----------\n");
 
     buf = (uchar*)malloc(sizeof(uchar) * DEF_MES_LEN);
 
@@ -26,10 +40,6 @@ int encrypt(void)
         memset(buf, 0, DEF_MES_LEN);
     }
 
-    lsb(DEF_K2_LSB);
-
-    set_block(DEF_X_OFFSET, DEF_Y_OFFSET);
-
     free(buf);
 
     return 0;
@@ -37,32 +47,37 @@ int encrypt(void)
 
 int lsb(int key)
 {
-    size_t i, j, k, p;
+    size_t i, j, k, p, b;
 
     p = 0;
     for(i = 0; i < DEF_IM_HEIGHT; i += key)
     {
         for(j = 0; j < DEF_IM_WIDTH; j += key)
         {
-            for(k = 0; k < DEF_IM_NOFC; k++)
+            if((i > DEF_Y_OFFSET - 2 * key && i < DEF_Y_OFFSET + DEF_BL_SIZE + 2 * key) \
+            && (j > DEF_X_OFFSET - 2 * key && j < DEF_X_OFFSET + DEF_BL_SIZE + 2 * key))
             {
-                if((i > DEF_Y_OFFSET - 2 * key && i < DEF_Y_OFFSET + DEF_BL_SIZE + 2 * key) \
-                && (j > DEF_X_OFFSET - 2 * key && j < DEF_X_OFFSET + DEF_BL_SIZE + 2 * key))
-                {
-                    continue;
-                }
+                continue;
+            }
 
-                if(p < COMP_LEN - 1)
-                {
-                    (COMP_BLOCK[p++]) ? ON_K_BIT(IM[i][j][k], 2) : OFF_K_BIT(IM[i][j][k], 2);
-                    (COMP_BLOCK[p++]) ? ON_K_BIT(IM[i][j][k], 1) : OFF_K_BIT(IM[i][j][k], 1);
-                }
-                else
-                {
-                    i = DEF_IM_HEIGHT;
-                    j = DEF_IM_WIDTH;
-                    k = DEF_IM_NOFC;
-                }
+            if(p < COMP_LEN)
+            {
+                CHECK_K_BIT(COMP_BLOCK[p], 1) ? ON_K_BIT(IM[i][j][1], 1) : OFF_K_BIT(IM[i][j][1], 1);
+                CHECK_K_BIT(COMP_BLOCK[p], 2) ? ON_K_BIT(IM[i][j][1], 2) : OFF_K_BIT(IM[i][j][1], 2);
+                CHECK_K_BIT(COMP_BLOCK[p], 3) ? ON_K_BIT(IM[i][j][1], 3) : OFF_K_BIT(IM[i][j][1], 3);
+
+                CHECK_K_BIT(COMP_BLOCK[p], 4) ? ON_K_BIT(IM[i][j][2], 1) : OFF_K_BIT(IM[i][j][2], 1);
+                CHECK_K_BIT(COMP_BLOCK[p], 5) ? ON_K_BIT(IM[i][j][2], 2) : OFF_K_BIT(IM[i][j][2], 2);
+                CHECK_K_BIT(COMP_BLOCK[p], 6) ? ON_K_BIT(IM[i][j][2], 3) : OFF_K_BIT(IM[i][j][2], 3);
+
+                CHECK_K_BIT(COMP_BLOCK[p], 7) ? ON_K_BIT(IM[i][j][3], 1) : OFF_K_BIT(IM[i][j][3], 1);
+                CHECK_K_BIT(COMP_BLOCK[p], 8) ? ON_K_BIT(IM[i][j][3], 2) : OFF_K_BIT(IM[i][j][3], 2);
+                p++;
+            }
+            else
+            {
+                i = DEF_IM_HEIGHT;
+                j = DEF_IM_WIDTH;
             }
         }
     }
@@ -79,7 +94,6 @@ int lsb(int key)
 uInt mcompress(void)
 {
     size_t i;
-    uInt len;
 
     z_stream defstream;
     defstream.zalloc = Z_NULL;
@@ -91,62 +105,31 @@ uInt mcompress(void)
     defstream.avail_out = (uInt)(sizeof(COMP_BLOCK)); // size of output
     defstream.next_out = (Bytef *)COMP_BLOCK; // output char array
 
-    deflateInit2(&defstream, Z_BEST_COMPRESSION, Z_DEFLATED, 8, 1, 4);
+    deflateInit(&defstream, Z_BEST_COMPRESSION);
     deflate(&defstream, Z_FINISH);
     deflateEnd(&defstream);
 
-    len = defstream.avail_out;
+    tlen = (uInt)((uchar*)defstream.next_out - COMP_BLOCK);
+
+    COMP_LEN = tlen;
     if(defstream.avail_out % 8)
     {
-        len = defstream.avail_out + (8 - (defstream.avail_out % 8));
-        for(i = defstream.avail_out; i < len; i++)
+        COMP_LEN = tlen + (8 - (tlen % 8));
+        for(i = tlen; i < COMP_LEN; i++)
         {
             COMP_BLOCK[i] = 0;
         }
     }
 
     printf("Input size is:\t\t%lu\n", sizeof(BLOCK));
-    printf("Compressed size is:\t%u\n", len);
-    printf("\n----------\n");
+    printf("Compressed size is:\t%u\n", COMP_LEN);
 
-    return len;
-}
-
-void mdecompress(void)
-{
-    size_t i;
-
-    z_stream infstream;
-    infstream.zalloc = Z_NULL;
-    infstream.zfree = Z_NULL;
-    infstream.opaque = Z_NULL;
-    // setup "b" as the input and "c" as the compressed output
-    infstream.avail_in = sizeof(COMP_BLOCK); // size of input
-    infstream.next_in = (Bytef *)COMP_BLOCK; // input char array
-    infstream.avail_out = (uInt)(sizeof(DECOMP_BLOCK)); // size of output
-    infstream.next_out = (Bytef *)DECOMP_BLOCK; // output char array
-
-    // the actual DE-compression work.
-    inflateInit(&infstream);
-    inflate(&infstream, Z_NO_FLUSH);
-    inflateEnd(&infstream);
-
-    printf("Uncompressed size is:\t%u\n", infstream.avail_out);
-    for(i = 0; i < DEF_BL_SIZE * DEF_BL_SIZE * DEF_IM_NOFC; i++)
-    {
-        // printf("%zu\t- %d | %d\n", i, BLOCK[i], DECOMP_BLOCK[i]);
-        if(BLOCK[i] != DECOMP_BLOCK[i])
-        {
-            printf("FALSE!\n");
-            exit(1);
-        }
-    }
-    printf("\n----------\n\n");
+    return 0;
 }
 
 int init_block(size_t x, size_t y)
 {
-    size_t i, j, k;
+    size_t i, j;
 
     if(x + DEF_BL_SIZE > DEF_IM_WIDTH || y + DEF_BL_SIZE > DEF_IM_HEIGHT)
     {
@@ -204,15 +187,15 @@ int setall(void)
         }
     }
 
-    for(i = 0; i < DEF_BL_LEN; i++)
-    {
-        BLOCK[i] = 0;
-    }
+    // for(i = 0; i < DEF_BL_LEN; i++)
+    // {
+    //     BLOCK[i] = 0;
+    // }
 
-    for(i = 0; i < DEF_BL_LEN * 2; i++)
+    for(i = 0; i < COMP_LEN * 2; i++)
     {
         COMP_BLOCK[i] = 0;
-        DECOMP_BLOCK[i] = 0;
+        DECOMP_BLOCK[i] = 125;
     }
 
     return 0;

@@ -25,6 +25,17 @@ int main(int argc, char *argv[])
         encrypt();
 
         write_png(DEF_ENCFILE);
+
+        setall();
+
+        if(load_png(DEF_ENCFILE))
+        {
+            return 1;
+        }
+
+        decrypt();
+
+        write_png(DEF_DECFILE);
     }
 
     printf("\n----------------------------------------------------------\n\n");
