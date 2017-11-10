@@ -47,15 +47,16 @@ int fbl(void)
 
 int lsb(int key)
 {
-    size_t i, j, k, p, b;
+    int i, j;
+    size_t k, p, b;
 
     p = 0;
     for(i = 0; i < DEF_IM_HEIGHT; i += key)
     {
         for(j = 0; j < DEF_IM_WIDTH; j += key)
         {
-            if((i > DEF_Y_OFFSET - 2 * key && i < DEF_Y_OFFSET + DEF_BL_SIZE + 2 * key) \
-            && (j > DEF_X_OFFSET - 2 * key && j < DEF_X_OFFSET + DEF_BL_SIZE + 2 * key))
+            if((i > (DEF_Y_OFFSET - 2 * key) && i < (DEF_Y_OFFSET + DEF_BL_SIZE + 2 * key)) \
+            && (j > (DEF_X_OFFSET - 2 * key) && j < (DEF_X_OFFSET + DEF_BL_SIZE + 2 * key)))
             {
                 continue;
             }
@@ -93,7 +94,7 @@ int lsb(int key)
 
 uInt mcompress(void)
 {
-    size_t i;
+    size_t i, j ,k, ii, jj, kk, u;
 
     z_stream defstream;
     defstream.zalloc = Z_NULL;
@@ -112,7 +113,7 @@ uInt mcompress(void)
     tlen = (uInt)((uchar*)defstream.next_out - COMP_BLOCK);
 
     COMP_LEN = tlen;
-    if(defstream.avail_out % 8)
+    if(tlen % 8)
     {
         COMP_LEN = tlen + (8 - (tlen % 8));
         for(i = tlen; i < COMP_LEN; i++)

@@ -2,8 +2,6 @@
 
 int decrypt(void)
 {
-    size_t i, j;
-
     flsb(DEF_K2_LSB);
     unfbl();
     mdecompress();
@@ -47,15 +45,16 @@ int unfbl(void)
 
 int flsb(int key)
 {
-    size_t i, j, k, p;
+    int i, j;
+    size_t k, p;
 
     p = 0;
     for(i = 0; i < DEF_IM_HEIGHT; i += key)
     {
         for(j = 0; j < DEF_IM_WIDTH; j += key)
         {
-            if((i > DEF_Y_OFFSET - 2 * key && i < DEF_Y_OFFSET + DEF_BL_SIZE + 2 * key) \
-            && (j > DEF_X_OFFSET - 2 * key && j < DEF_X_OFFSET + DEF_BL_SIZE + 2 * key))
+            if((i > (DEF_Y_OFFSET - 2 * key) && i < (DEF_Y_OFFSET + DEF_BL_SIZE + 2 * key)) \
+            && (j > (DEF_X_OFFSET - 2 * key) && j < (DEF_X_OFFSET + DEF_BL_SIZE + 2 * key)))
             {
                 continue;
             }
@@ -121,8 +120,6 @@ int mdecompress(void)
             printf("%zu\t- %d | %d\n", i, BLOCK[i], DECOMP_BLOCK[i]);
             // printf("FALSE!\n");
             break;
-            // exit(1);
-            // getchar();
         }
     }
 

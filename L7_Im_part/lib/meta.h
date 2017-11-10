@@ -28,10 +28,10 @@
 #define G(X)                (X[1])
 #define B(X)                (X[2])
 
-#define DEF_BL_SIZE         262
+#define DEF_BL_SIZE         275
 #define DEF_BL_LEN          DEF_BL_SIZE * DEF_BL_SIZE * DEF_IM_NOFC
-#define DEF_X_OFFSET        (int)(DEF_IM_WIDTH / 2.0 - DEF_BL_SIZE / 2.0)
-#define DEF_Y_OFFSET        (int)(DEF_IM_HEIGHT / 2.0 - DEF_BL_SIZE / 2.0)
+#define DEF_X_OFFSET        150//(int)(DEF_IM_WIDTH / 2.0 - DEF_BL_SIZE / 2.0)
+#define DEF_Y_OFFSET        220//(int)(DEF_IM_HEIGHT / 2.0 - DEF_BL_SIZE / 2.0)
 
 #define DEF_K2_LSB          1
 
