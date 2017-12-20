@@ -12,6 +12,8 @@ int main(int argc, char *argv[])
     get_mass("out.txt");
     get_image();
 
+    write_png(DEF_ENCFILE);
+
     printf("\n----------------------------------------------------------\n\n");
 
     return 0;
@@ -77,6 +79,16 @@ int get_image(void)
             ti = reverse_bits(i);
             tj = reverse_bits(j);
             RB_IM[ti][tj] = T_IM[i][j];
+        }
+    }
+
+    for(i = 0; i < DEF_IM_HEIGHT; i++)
+    {
+        for(j = 0; j < DEF_IM_WIDTH; j++)
+        {
+            R(IM[i][j]) = RB_IM[i][j] * 10;
+            G(IM[i][j]) = RB_IM[i][j] * 10;
+            B(IM[i][j]) = RB_IM[i][j] * 10;
         }
     }
 
