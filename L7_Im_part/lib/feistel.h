@@ -15,6 +15,7 @@
 #define SET_PART(X, PART, NUM)  (((int64)(PART) << 16 * (NUM)) | (int64)(X))
 #define MOOVE_R_B(X, Y)         (( (X) >> (Y) ) | ( (X) << ( (Y) & (int32)(65535) )))
 #define MOOVE_L_B(X, Y)         (( (X) << (Y) ) | ( (X) >> ( (Y) & (int32)(65535) )))
+#define FEISTEL_KEY             "t<?dlf^sd#"
 
 //--------------------------------------------------------------------------------//
 

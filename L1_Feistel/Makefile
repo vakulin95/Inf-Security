@@ -3,7 +3,7 @@
 CFLAGS = -c -w -O3
 LFLAGS = -lm -o
 
-all: clean built
+all: clean built run_b
 
 built: feistel.o main.o
 	@gcc $^ $(LFLAGS) main.out

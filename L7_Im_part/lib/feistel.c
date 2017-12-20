@@ -84,12 +84,15 @@ void conv_int(int64 X, unsigned char **str)
 void cr_keys(void)
 {
     int i;
+    char K[DEF_ROUNDS + 1];
+
+    sprintf(K, "%s", FEISTEL_KEY);
 
     srand(time(0));
 
 	for(i = 0; i < DEF_ROUNDS - 1; i++)
 	{
-        KEYS[i] = MOOVE_R_B((int16)100, i * 8);
+        KEYS[i] = MOOVE_R_B((int16)K[i], i * 8);
 	}
 
 	return;
