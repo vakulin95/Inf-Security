@@ -13,7 +13,9 @@
 #define DEF_PATH            "files/"
 #define DEF_PATH_STR_LEN    125
 
+#define DEF_INFILE          "in.png"
 #define DEF_ENCFILE         "enc_out.png"
+#define DEF_DECFILE         "dec_out.png"
 
 #define DEF_IM_WIDTH        512
 #define DEF_IM_HEIGHT       DEF_IM_WIDTH // 512

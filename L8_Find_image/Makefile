@@ -11,7 +11,7 @@ THIS_FILE := $(lastword $(MAKEFILE_LIST))
 
 #=================================#
 
-all: built run clean
+all: oclean built run clean
 
 #---------------------------------#
 
@@ -30,3 +30,6 @@ run:
 
 clean:
 	@rm -rf *.o *.out
+
+oclean:
+	@rm -rf $(OUTDIR)*.png

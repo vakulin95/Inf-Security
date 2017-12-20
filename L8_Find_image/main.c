@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 {
     printf("\n----------------------------------------------------------\n\n");
 
-    get_mass("out.txt");
+    get_mass("out.dat");
     get_image();
 
     write_png(DEF_ENCFILE);
